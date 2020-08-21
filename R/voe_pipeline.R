@@ -2,19 +2,21 @@
 #' The VOE Pipeline
 #'
 #' This function will run the full pipeline
-#' @param metadata See project descriptsions for more details. Needs to have two columns, dataset name, and then a tibble with all the data
-#' @param abundance_data This is the abundance data you need. See project descriptions for more details
-#' @param mapping This maps the column names in abundance data to their actual gene names
-#' @keywords pipeine
+#' #' @param dependent_variables A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
+#' @param independent_variables A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @keywords pipeline
 #' @export
 #' @examples
 #' viepipeline(metadata, abundance_data, mapping)
-voepipeline <- function(metadata, abundance_data, mapping){
+voepipeline <- function(dependent_variables,independent_variables,primary_variable){
   #Each line of code is a different step
-  data_assocations <- compute_assocations(metadata, abundance_data, 'CRC')
-  metaanalysis <- compute_metaanalysis(data_assocations)
-  cleanmetaanalysis <- clean_metaanalysis(metaanalysis, mapping)
-  plot_volcano_and_find_vibrations(cleanmetaanalysis)
+  association_output <- compute_initial_associations(independent_variables, dependent_variables, primary_variable)
+  ####PARSE ASSOCIATION OUTPUT
+  #metaanalysis <- compute_metaanalysis(data_assocations)
+  #cleanmetaanalysis <- clean_metaanalysis(metaanalysis, mapping)
+  features_of_interest = plot_volcano_and_find_vibrations(association_output,FALSE)
+  compute_vibrations(features_of_interest)
 }
 
 

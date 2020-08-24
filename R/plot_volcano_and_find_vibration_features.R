@@ -10,7 +10,7 @@ plot_volcano_and_find_vibrations <- function(initial_association_output,generate
       xlab('Esimate Size')
     ggsave('fdr_volcano_plot_initial_associations.pdf')
   }
-  to_vibrate = initial_association_output %>% filter(pvalue_adjusted < 0.05) %>% select(feature) %>% unname %>% unlist
+  to_vibrate = initial_association_output %>% filter(by.p.val < 0.05) %>% select(feature) %>% unname %>% unlist
   write.csv(to_vibrate,'features_for_vibration')
   return(to_vibrate)
 }

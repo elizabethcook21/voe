@@ -34,7 +34,8 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
   }
   independent_variables=independent_variables %>% select(-all_of(todrop))
   regression_df=left_join(independent_variables %>% mutate_if(is.factor, as.character), dependent_variables %>% select(sampleID,feature),by = c("sampleID")) %>% mutate_if(is.character, as.factor) %>% drop_na() ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
-    varset=powerSet(colnames(regression_df %>% select(-sampleID,primary_variable,-c(as.character(feature)))))
+  variables_to_vibrate=colnames(regression_df %>% select(-sampleID,-primary_variable,-c(as.character(feature))))
+    varset=powerSet(variables_to_vibrate)
       if(length(varset)>10){
         varset=sample(varset,10)
     }
@@ -55,12 +56,6 @@ compute_vibrations <- function(dependent_variables, independent_variables, prima
     rbind, #combine all features
     .init = NA_real_ # .init is supplied as the first value to start the accumulation in reduce, as o.w. reduce with throw error for empty starting value
   )
-  return(output)
+  vibration_variables = independent_variables %>% select(-sampleID,-primary_variable) %>% colnames
+  return(list('vibration_output'=output,'vibration_variables'=vibration_variables))
 }
-
-independent_variables=readRDS('data/final_metadata.rds')[[2]][[1]] %>% select(-subjectID,-runID) %>% type.convert
-dependent_variables=readRDS('data/abundance_data.rds') %>% select(-dataset_name)
-features_of_interest=colnames(dependent_variables)[2:3]
-test=compute_vibrations(dependent_variables, independent_variables, primary_variable, features_of_interest)
-
-

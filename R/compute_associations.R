@@ -42,7 +42,8 @@ run_associations <- function(independent_variables,dependent_variables,primary_v
     print(todrop)
   }
   independent_variables=independent_variables %>% select(-all_of(todrop))
-  out = map(seq_along(dependent_variables %>% select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable))%>% bind_rows %>% filter(term!='(Intercept)') %>% mutate(pvalue_adjusted = p.adjust(p.value,method='BY'))
+  out = map(seq_along(dependent_variables %>% select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable))%>% bind_rows %>% filter(term!='(Intercept)') %>% mutate( bonferroni.p.val = p.adjust(p.value, method = "bonferroni"), bh.p.val = p.adjust(p.value, method = "BH"), by.p.val = p.adjust(p.value, method = "BY")
+  )
   return(out)
 }
 

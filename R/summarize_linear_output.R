@@ -18,12 +18,6 @@ library(lmerTest)
 
 ###mixed effects model to look at confounder analysis
 
-analyze_confounders <- function(){
-
-}
-
-#needs that weird function to expand vibration output
-
 filter_unnest_feature_vib <- function(vib_df) {
   return(vib_df %>% slice(which(map_lgl(vib_df$feature_fit, ~class(.)[[1]] == "tbl_df"))) %>% unnest(feature_fit))
 }
@@ -47,11 +41,25 @@ find_confounders_linear <- function(voe_list_for_reg){
   return(fit_estimate_forplot)
 }
 
-voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]])
+summarize_vibration_data_by_feature <- function(df){
+  p <- c(0.01,.5,.99)
+  p_names <- map_chr(p, ~paste0('estimate_quantile_',.x*100, "%"))
+  p_funs <- map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>% set_names(nm = p_names)
+  model_counts = df %>% count(independent_feature) %>% rename(number_of_models=n)
+  df_estimates = suppressMessages(df %>% group_by(independent_feature) %>% summarize_at(vars(estimate), funs(!!!p_funs)) %>% mutate(estimate_diff_99_1 = `estimate_quantile_99%`-`estimate_quantile_1%`,janus_effect=df %>% group_by(independent_feature) %>% summarise(janus_effect = sum(estimate > 0, na.rm = TRUE)/sum(is.finite(estimate), na.rm = TRUE)) %>% ungroup() %>% select(janus_effect) %>% unname %>% unlist))
+  p_names <- map_chr(p, ~paste0('pval_quantile_',.x*100, "%"))
+  p_funs <- map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>% set_names(nm = p_names)
+  df_pval = df %>% group_by(independent_feature) %>% summarize_at(vars(p.value), funs(!!!p_funs)) %>% mutate(pvalue_diff_99_1 = `pval_quantile_99%`-`pval_quantile_1%`)
+  summarized_voe_data=bind_cols(model_counts, df_estimates %>% select(-independent_feature),df_pval %>% select(-independent_feature))
+  return(summarized_voe_data)
+}
 
-voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated) %>% select(-vars)
 
-find_confounders_linear(voe_unnested_annotated)
-
-
+analyze_voe_data <- function(vibration_output){
+  voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]])
+  voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated) %>% select(-vars)
+  summarized = summarize_vibration_data_by_feature(voe_unnested_annotated)
+  confounder_analysis = find_confounders_linear(voe_unnested_annotated)
+  return(list('summarized_vibration_output'= summarized,'confounder_analysis'=confounder_analysis,'data'=voe_unnested_annotated))
+}
 

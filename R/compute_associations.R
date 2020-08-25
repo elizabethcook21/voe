@@ -19,7 +19,7 @@ compute_microbial_feature_proportions_helper <- function(model_ready_df, metaphl
 
 regression <- function(j,independent_variables,dependent_variables,primary_variable){
   feature_name = colnames(dependent_variables)[j+1]
-  print(str_c("feature no.: ", j)) # print feature no. currently working on
+  #print(str_c("feature no.: ", j)) # print feature no. currently working on
   regression_df=left_join(independent_variables %>% mutate_if(is.factor, as.character), dependent_variables %>% select(c(1, (j + 1))),by = c("sampleID")) %>% mutate_if(is.character, as.factor) %>% drop_na() ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
   regression_df %<>% select(-sampleID)
   #run regression
@@ -30,7 +30,12 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
   )
 }
 
-run_associations <- function(independent_variables,dependent_variables,primary_variable){
+run_associations <- function(x,primary_variable){
+  dependent_variables <- as_tibble(x[[1]])
+  independent_variables <- as_tibble(x[[2]])
+  message(paste('Computing',as.character(ncol(dependent_variables)-1),'associations for dataset',as.character(unname(unlist(x[[3]])))))
+  colnames(dependent_variables)[1]='sampleID'
+  colnames(independent_variables)[1]='sampleID'
   ######POTENTIAL FEATURE: ADD FUDGE FACTOR? OR PRESPECIFY?
   #fudge_factor <- min((metaphlan_df %>% select(-1, -2) %>% unlist())[which((metaphlan_df %>% select(-1, -2) %>% unlist()) > 0)])
   #iterate through each cohort for each feature
@@ -42,16 +47,13 @@ run_associations <- function(independent_variables,dependent_variables,primary_v
     print(todrop)
   }
   independent_variables=independent_variables %>% select(-all_of(todrop))
-  out = map(seq_along(dependent_variables %>% select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable))%>% bind_rows %>% filter(term!='(Intercept)') %>% mutate( bonferroni.p.val = p.adjust(p.value, method = "bonferroni"), bh.p.val = p.adjust(p.value, method = "BH"), by.p.val = p.adjust(p.value, method = "BY")
+  out = map(seq_along(dependent_variables %>% select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable))%>% bind_rows %>% filter(term!='(Intercept)') %>% mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY")
   )
+  out = out %>% mutate(dataset_id=x[[3]])
   return(out)
 }
 
-compute_initial_associations <- function(dependent_variables,independent_variables,primary_variable) {
-  dependent_variables <- as_tibble(dependent_variables)
-  independent_variables <- as_tibble(independent_variables)
-  colnames(independent_variables)[1]='sampleID'
-  colnames(dependent_variables)[1]='sampleID'
-  output <- run_associations(independent_variables,dependent_variables,primary_variable)
+compute_initial_associations <- function(bound_data,primary_variable) {
+  output = bind_rows(apply(bound_data, 1, function(x) run_associations(x,primary_variable)))
   return(output)
 }

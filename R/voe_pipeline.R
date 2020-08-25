@@ -5,18 +5,52 @@
 #' @param dependent_variables A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
 #' @param independent_variables A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
 #' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param fdr_method Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
+#' @param fdr_cutoff Cutoff for an FDR significant association (default = 0.05).
+#' @param max_vibration_num Maximum number of vibrations (default=50000).
 #' @keywords pipeline
 #' @export
 #' @examples
-#' viepipeline(metadata, abundance_data, mapping)
-full_pipeline <- function(dependent_variables,independent_variables,primary_variable){
-  #Each line of code is a different step
-  ####pre-run check
-  association_output <- compute_initial_associations(independent_variables, dependent_variables, primary_variable)
-  ####save association output?
-  #metaanalysis <- compute_metaanalysis(data_assocations)
-  #cleanmetaanalysis <- clean_metaanalysis(metaanalysis, mapping)
-  features_of_interest = plot_volcano_and_find_vibrations(association_output,FALSE)
-  compute_vibrations(features_of_interest)
+#' voepipeline(metadata, abundance_data, mapping)
+full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,meta_analysis=FALSE){
+  output_to_return = list()
+  if(inherits(dependent_variables, "list")){
+    message('Identified multiple input datasets, preparing to run meta-analysis.')
+    bound_data = tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
+    if(meta_analysis==FALSE){
+      message('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.')
+    }
+  }
+  else{
+    bound_data = tibble(dependent_variables=list(dependent_variables),dependent_variables=list(dependent_variables),dsid=1)
+  }
+  output_to_return[['original_data']] = bound_data
+  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,meta_analysis)
+  if(passed==TRUE){
+    Sys.sleep(2)
+    message('Deploying initial associations...')
+    association_output <- compute_initial_associations(bound_data, primary_variable)
+    output_to_return[['initial_association_output']] = association_output
+    if(meta_analysis == TRUE){
+      metaanalysis <- compute_metaanalysis(association_output)
+      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)
+      output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
+      features_of_interest = metaanalysis_cleaned %>% filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% select(feature) %>% unname %>% unlist
+    }
+    else{
+      features_of_interest = association_output %>% filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% select(feature) %>% unname %>% unlist
+    }
+    if(length(features_of_interest)==0){
+      return(message('No FDR significant features found, consider adjusting parameters or data and trying again.'))
+    }
+    output_to_return[['features_to_vibrate_over']] = features_of_interest
+    vibration_output = compute_vibrations(bound_data,primary_variable,features_of_interest,max_vibration_num)
+    output_to_return[['vibration_variables']] = vibration_output[[2]]
+    analyzed_voe_data = analyze_voe_data(vibration_output)
+    output_to_return[['analyzed_voe_data']] = analyzed_voe_data
+    message('Done!')
+    return(output_to_return)
+  }
 }
 
+full_voe_pipeline(dependent_variables,independent_variables,primary_variable,'BY',.99,50,FALSE)

@@ -17,13 +17,13 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
     message('Identified multiple input datasets, preparing to run meta-analysis.')
-    bound_data = tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
+    bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
     if(meta_analysis==FALSE){
       message('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.')
     }
   }
   else{
-    bound_data = tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
+    bound_data = dplyr::tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
   passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,meta_analysis)
@@ -36,10 +36,10 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       metaanalysis <- compute_metaanalysis(association_output)
       metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)
       output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
-      features_of_interest = metaanalysis_cleaned %>% filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% select(feature) %>% unname %>% unlist
+      features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature) %>% unname %>% unlist
     }
     else{
-      features_of_interest = association_output %>% filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% select(feature) %>% unname %>% unlist
+      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature) %>% unname %>% unlist
     }
     if(length(features_of_interest)==0){
       return(message('No FDR significant features found, consider adjusting parameters or data and trying again.'))

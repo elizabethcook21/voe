@@ -1,20 +1,3 @@
-#summarize vibration of effects output
-library(ggplot2)
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(magrittr)
-library(broom)
-library(stringr) # regex pattern matching
-library(rlang) # rlang::duplicate()
-library(broom.mixed)
-library(rje)
-library(lmerTest)
-###plot volcano colored by janus effect
-
-
-###extract out vibration data
-
 
 ###mixed effects model to look at confounder analysis
 
@@ -25,7 +8,7 @@ filter_unnest_feature_vib <- function(vib_df) {
 get_adjuster_expanded_vibrations <- function(voe_df, adjusters) {
   copy_voe_df <- duplicate(voe_df, shallow = FALSE)
   for (variable in adjusters) {
-    copy_voe_df %<>% mutate(newcol = map_int(copy_voe_df$vars, ~(variable %in% .)))
+    copy_voe_df  = copy_voe_df %>% mutate(newcol = map_int(copy_voe_df$vars, ~(variable %in% .)))
     colnames(copy_voe_df)[length(colnames(copy_voe_df))] <- variable
   }
   return(copy_voe_df)

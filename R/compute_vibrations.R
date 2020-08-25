@@ -1,10 +1,3 @@
-suppressMessages(library(dplyr))
-suppressMessages(library(purrr))
-suppressMessages(library(tidyr))
-suppressMessages(library(magrittr))
-suppressMessages(library(rje))
-suppressMessages(library(broom))
-suppressMessages(library(stringr))
 
 # Workflow:
 # 1) get features want to vibrate over, stored as a vector in an RDS (from and lit review)

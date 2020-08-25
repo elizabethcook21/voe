@@ -1,10 +1,3 @@
-suppressMessages(library(dplyr))
-suppressMessages(library(purrr))
-suppressMessages(library(tidyr))
-suppressMessages(library(magrittr))
-suppressMessages(library(broom))
-suppressMessages(library(stringr))
-
 # For a single feature and single modeldf outputted by prune_metadata.R, computes the proportion of non-zero values per cohort.
 compute_microbial_feature_proportions_helper <- function(model_ready_df, metaphlan_df, feature_num) {
   #browser()
@@ -21,7 +14,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
   feature_name = colnames(dependent_variables)[j+1]
   #print(str_c("feature no.: ", j)) # print feature no. currently working on
   regression_df=left_join(independent_variables %>% mutate_if(is.factor, as.character), dependent_variables %>% select(c(1, (j + 1))),by = c("sampleID")) %>% mutate_if(is.character, as.factor) %>% drop_na() ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
-  regression_df %<>% select(-sampleID)
+  regression_df = regression_df %>% select(-sampleID)
   #run regression
   tryCatch(tidy(stats::lm(as.formula(str_c("I(`", feature_name,"`) ~ ",primary_variable)),data = regression_df))%>% mutate(feature=feature_name),
            # NOTE: tidy() ends up removing and singularity fits (e.g. NA fits from a feature that, for the dataset's samples all have 0 relative abundance) #####NEED TO LOG THIS SOMEHOW

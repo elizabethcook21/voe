@@ -6,7 +6,7 @@ compute_metaanalysis <- function(df) {
     new_colname = features[[i]]
     df_sub = df %>% filter(feature==features[[i]])
     number_datasets = nrow(df_sub)
-    new_df %<>% mutate(new = list(tryCatch(metagen(estimate,
+    new_df =new_df %>% mutate(new = list(tryCatch(metagen(estimate,
                                                    std.error,
                                                    data = df_sub,
                                                    studlab = dataset_id,

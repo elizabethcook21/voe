@@ -1,7 +1,5 @@
 #find and remove features that only showed up in one cohort (for multi cohort phenotypes only) after meta-analysis
 
-suppressMessages(library(tidyverse))
-
 filter_single_cohort <- function(){
   #args <- commandArgs(trailingOnly = TRUE)
   #args <- c('2020_T2D_Data/Karlsson_metaanlysis.rds', '2020_T2D_Data/Karlsson_metaanalysis_filtered.rds')

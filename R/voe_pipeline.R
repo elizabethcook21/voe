@@ -8,13 +8,14 @@
 #' @param fdr_method Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
 #' @param fdr_cutoff Cutoff for an FDR significant association (default = 0.05).
 #' @param max_vibration_num Maximum number of vibrations (default=50000).
+#' @param meta_analysis TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
 #' @keywords pipeline
 #' @export
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
 full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,meta_analysis=FALSE){
   output_to_return = list()
-  if(inherits(dependent_variables, "list")){
+  if(inherits(dependent_variables, "list")==TRUE){
     message('Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
     if(meta_analysis==FALSE){
@@ -22,7 +23,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     }
   }
   else{
-    bound_data = tibble(dependent_variables=list(dependent_variables),dependent_variables=list(dependent_variables),dsid=1)
+    bound_data = tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
   passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,meta_analysis)
@@ -52,5 +53,3 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     return(output_to_return)
   }
 }
-
-full_voe_pipeline(dependent_variables,independent_variables,primary_variable,'BY',.99,50,FALSE)

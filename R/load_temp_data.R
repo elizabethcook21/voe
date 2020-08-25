@@ -9,3 +9,6 @@ dependent_variables = dependent_variables[,1:200]
 primary_variable = 'BMI'
 fdr_method='BY'
 fdr_cutoff=.99
+
+dependent_variables=list('dataset1'=dependent_variables,'dataset2'=dependent_variables)
+independent_variables=list('dataset1'=independent_variables,'dataset2'=independent_variables)

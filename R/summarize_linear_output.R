@@ -29,10 +29,10 @@ summarize_vibration_data_by_feature <- function(df){
   p_names <- purrr::map_chr(p, ~paste0('estimate_quantile_',.x*100, "%"))
   p_funs <- purrr::map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>% set_names(nm = p_names)
   model_counts = df %>% count(independent_feature) %>% rename(number_of_models=n)
-  df_estimates = suppressMessages(df %>% dplyr::group_by(independent_feature) %>% summarize_at(vars(estimate), funs(!!!p_funs)) %>% dplyr::mutate(estimate_diff_99_1 = `estimate_quantile_99%`-`estimate_quantile_1%`,janus_effect=df %>% dplyr::group_by(independent_feature) %>% dplyr::summarise(janus_effect = sum(estimate > 0, na.rm = TRUE)/sum(is.finite(estimate), na.rm = TRUE)) %>% dplyr::ungroup() %>% select(janus_effect) %>% unname %>% unlist))
+  df_estimates = suppressMessages(df %>% dplyr::group_by(independent_feature) %>% summarize_at(vars(estimate), tibble::lst(!!!p_funs)) %>% dplyr::mutate(estimate_diff_99_1 = `estimate_quantile_99%`-`estimate_quantile_1%`,janus_effect=df %>% dplyr::group_by(independent_feature) %>% dplyr::summarise(janus_effect = sum(estimate > 0, na.rm = TRUE)/sum(is.finite(estimate), na.rm = TRUE)) %>% dplyr::ungroup() %>% select(janus_effect) %>% unname %>% unlist))
   p_names <- purrr::map_chr(p, ~paste0('pval_quantile_',.x*100, "%"))
   p_funs <- purrr::map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>% set_names(nm = p_names)
-  df_pval = df %>% dplyr::group_by(independent_feature) %>% dplyr::summarize_at(vars(p.value), funs(!!!p_funs)) %>% dplyr::mutate(pvalue_diff_99_1 = `pval_quantile_99%`-`pval_quantile_1%`)
+  df_pval = df %>% dplyr::group_by(independent_feature) %>% dplyr::summarize_at(vars(p.value), tibble::lst(!!!p_funs)) %>% dplyr::mutate(pvalue_diff_99_1 = `pval_quantile_99%`-`pval_quantile_1%`)
   summarized_voe_data=dplyr::bind_cols(model_counts, df_estimates %>% dplyr::select(-independent_feature),df_pval %>% dplyr::select(-independent_feature))
   return(summarized_voe_data)
 }

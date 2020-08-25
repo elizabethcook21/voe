@@ -2,6 +2,7 @@
 compute_metaanalysis <- function(df) {
   new_df <- tibble(analysis = "meta-analysis") # create new tibble with placeholder column
   message('Computing meta-analysis')
+  features=unique(df$feature)
   for (i in seq_along(features)) {
     new_colname = features[[i]]
     df_sub = df %>% filter(feature==features[[i]])

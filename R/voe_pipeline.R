@@ -13,24 +13,24 @@
 #' @export
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
-full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,meta_analysis=FALSE){
+full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=0.1,meta_analysis=FALSE){
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
     message('Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
     if(meta_analysis==FALSE){
-      message('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.')
+      return(message('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
     }
   }
   else{
     bound_data = dplyr::tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
-  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,meta_analysis)
+  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis)
   if(passed==TRUE){
     Sys.sleep(2)
     message('Deploying initial associations...')
-    association_output <- compute_initial_associations(bound_data, primary_variable)
+    association_output <- compute_initial_associations(bound_data, primary_variable, proportion_cutoff)
     output_to_return[['initial_association_output']] = association_output
     if(meta_analysis == TRUE){
       metaanalysis <- compute_metaanalysis(association_output)
@@ -45,7 +45,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       return(message('No FDR significant features found, consider adjusting parameters or data and trying again.'))
     }
     output_to_return[['features_to_vibrate_over']] = features_of_interest
-    vibration_output = compute_vibrations(bound_data,primary_variable,features_of_interest,max_vibration_num)
+    vibration_output = compute_vibrations(bound_data,primary_variable,features_of_interest,max_vibration_num, proportion_cutoff)
     output_to_return[['vibration_variables']] = vibration_output[[2]]
     analyzed_voe_data = analyze_voe_data(vibration_output)
     output_to_return[['analyzed_voe_data']] = analyzed_voe_data

@@ -1,18 +1,19 @@
 #pre-flight checks
 
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,meta_analysis){
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis){
   message('Checking input data...')
   if(meta_analysis==TRUE){
     message(paste('Primary variable of interest: ',primary_variable,sep=''))
     message(paste('FDR method: ',fdr_method,sep=''))
     message(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
+    message(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     num_features = map(dependent_variables, function(x) ncol(x)-1)
     num_samples = map(dependent_variables, function(x) nrow(x)-1)
     num_ind = map(independent_variables, function(x) ncol(x)-1)
     data_summary = bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% mutate(dataset_number=seq_along(num_features))    %>% mutate(max_models_per_feature = `Number of adjusters`*max_vibration_num)
     message('Preparing to run pipeline with the following parameters:')
-    print(data_summary)
+    message(data_summary)
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
     message(paste('This works out to a max of',as.character(max_models),'models across all features and, assuming 1% of all features being significant,',as.character(.01*max_models),'vibrations.'))
@@ -35,6 +36,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     message(paste('FDR method: ',fdr_method,sep=''))
     message(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
+    message(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
     message(paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 1% of all features being significant,',as.character(.01*max_models),'vibrations.'))

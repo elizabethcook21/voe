@@ -20,6 +20,8 @@ Imports:
     purrr,
     tidyr,
     magrittr,
+    getopt,
+    devtools,
     broom,
     stringr,
     rlang,

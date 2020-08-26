@@ -11,9 +11,14 @@
 #' viepipeline(metadata, abundance_data, mapping)
 voepipeline <- function(metadata, abundance_data, mapping){
   #Each line of code is a different step
-  data_assocations <- compute_assocations(metadata, abundance_data, 'CRC')
+  logger <- initialize_logger()
+  log4r::info(logger, "Computing the Associations")
+  data_assocations <- compute_assocations(metadata, abundance_data, 'CRC', logger)
+  log4r::info(logger, "Computing the Metanalysis")
   metaanalysis <- compute_metaanalysis(data_assocations)
+  log4r::info(logger, "Cleaning the Metanalysis")
   cleanmetaanalysis <- clean_metaanalysis(metaanalysis, mapping)
+  log4r::info(logger, "Plotting the volcano plots")
   plot_volcano_and_find_vibrations(cleanmetaanalysis)
 }
 

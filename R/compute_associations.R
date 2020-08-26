@@ -167,7 +167,7 @@ compute_lm_associations <- function(df, metaphlan_df,phenotype){
   return(df)
 }
 
-compute_assocations <- function(metadata, abundance_data, pheno) {
+compute_assocations <- function(metadata, abundance_data, pheno, logger) {
   # Example Data
   #args <- c('1_prepared_metadata.rds', '2020_T2D_Data/abundance_data.rds', 'Karlsson_associations.rds','CRC')
   cmd_file <- as_tibble(metadata)

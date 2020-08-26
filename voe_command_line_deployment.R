@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 
 library(getopt)
-library(devtools)
 
 ### arguments
 spec = matrix(c(
@@ -34,30 +33,30 @@ if ( is.null(opt$model_type ) ) { opt$model_type = 'gaussian' }
 if ( is.null(opt$meta_analysis ) ) { opt$meta_analysis = FALSE }
 
 # run pipeline
-
+library(devtools)
 devtools::install_local(opt$path_to_repository, force=TRUE)
 library(voe)
 devtools::load_all()
 
 message('Parsing input data...')
-
 dependent_variable_locs = strsplit(opt$dependent_variables,',')
 dependent_variables=list()
-if(length(dependent_variable_locs)>1){
-	for(i in seq_along(dependent_variables))
-		dependent_variables[[i]]=readRDS(dependent_variable_locs[[i]])
+
+if(length(dependent_variable_locs[[1]])>1){
+	for(i in seq_along(dependent_variable_locs[[1]]))
+		dependent_variables[[i]]=readRDS(dependent_variable_locs[[1]][[i]])
 }
-if(length(dependent_variable_locs)==1){
+if(length(dependent_variable_locs[[1]])==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])
 }
 
 independent_variable_locs = strsplit(opt$independent_variables,',')
 independent_variables=list()
-if(length(independent_variable_locs)>1){
-	for(i in seq_along(independent_variables))
-		independent_variables[[i]]=readRDS(independent_variable_locs[[i]])
+if(length(independent_variable_locs[[1]])>1){
+	for(i in seq_along(independent_variable_locs[[1]]))
+		independent_variables[[i]]=readRDS(independent_variable_locs[[1]][[i]])
 }
-if(length(independent_variable_locs)==1){
+if(length(independent_variable_locs[[1]])==1){
 	independent_variables=readRDS(independent_variable_locs[[1]])
 }
 

@@ -9,7 +9,7 @@ spec = matrix(c(
   'independent_variables', 'i', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'primary_variable', 'v', 2, "character","Primary independent variable of interest.",
   'output_path', 'o', 2, "character","Output rds name",
-  'fdr_method', 'm', 1, "character","Multiple hypothesis testing method (BY, BH, 'bonferroni, default = BY)",
+  'fdr_method', 'm', 1, "character","Multiple hypothesis testing method (BY, BH, bonferroni, default = BY)",
   'fdr_cutoff', 'c', 1, "double","Float between 0.0 and 1.0, FDR-adjusted p-value threshold. (default = 0.05)",
   'max_vibration_num', 'n', 1, "integer","Integer, max number of vibrations per feature. (default = 50000)",
   'proportion_cutoff', 'p', 1, "double","Float between 0.0 and 1.0. (default = 0.9",

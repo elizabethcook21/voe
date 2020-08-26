@@ -1,13 +1,13 @@
 
 compute_metaanalysis <- function(df) {
-  new_df <- tibble(analysis = "meta-analysis") # create new tibble with placeholder column
+  new_df <- tibble::tibble(analysis = "meta-analysis") # create new tibble with placeholder column
   message('Computing meta-analysis')
   features=unique(df$feature)
   for (i in seq_along(features)) {
     new_colname = features[[i]]
-    df_sub = df %>% filter(feature==features[[i]])
+    df_sub = df %>% dplyr::filter(feature==features[[i]])
     number_datasets = nrow(df_sub)
-    new_df =new_df %>% mutate(new = list(tryCatch(meta::metagen(estimate,
+    new_df =new_df %>% dplyr::mutate(new = list(tryCatch(meta::metagen(estimate,
                                                    std.error,
                                                    data = df_sub,
                                                    studlab = dataset_id,
@@ -21,9 +21,9 @@ compute_metaanalysis <- function(df) {
                                            warning = function(w) w, # if warning return warning, don't want results at all to keep data and outputs as clean as possible (previously outputted list of 2, results and warnings)
                                            error = function(e) e))  # if results in error, return error
     )
-    new_df = new_df %>% rename(!!features[[i]]:=new)
+    new_df = new_df %>% dplyr::rename(!!features[[i]]:=new)
   }
-  return(new_df %>% select(-analysis)) # remove placeholder column
+  return(new_df %>% dplyr::select(-analysis)) # remove placeholder column
 }
 
 get_converged_metadfs <- function(meta_df) {
@@ -47,21 +47,21 @@ get_summary_stats <- function(input_meta_df) {
     message(paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe'))
   }
   return(
-    tibble(
+    tibble::tibble(
       feature = colnames(meta_df),
-      estimate = map_dbl(meta_df, ~.[[1]]$TE.random),
-      p.val = map_dbl(meta_df, ~.[[1]]$pval.random),
+      estimate = purrr::map_dbl(meta_df, ~.[[1]]$TE.random),
+      p.val = purrr::map_dbl(meta_df, ~.[[1]]$pval.random),
       bonferroni = p.adjust(p.val, method = "bonferroni"),
       BH = p.adjust(p.val, method = "fdr"),
       BY = p.adjust(p.val, method = "BY"),
-      CI_95_lower = map_dbl(meta_df, ~.[[1]]$lower.random),
-      CI_95_upper = map_dbl(meta_df, ~.[[1]]$upper.random)
+      CI_95_lower = purrr::map_dbl(meta_df, ~.[[1]]$lower.random),
+      CI_95_upper = purrr::map_dbl(meta_df, ~.[[1]]$upper.random)
     )
   )
 }
 
 clean_metaanalysis <- function(metaanalysis) {
-  meta_outputs <- as_tibble(metaanalysis)
+  meta_outputs <- tibble::as_tibble(metaanalysis)
   output <- get_summary_stats(meta_outputs)
   return(output)
 }

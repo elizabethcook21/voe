@@ -38,25 +38,17 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       metaanalysis <- compute_metaanalysis(association_output)
       metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)
       output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
-      features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature) %>% unname %>% unlist
+      features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
     }
     else{
-    #  if(model_type=='rf' and rf_use_RMSE==TRUE){
-    #  features_of_interest = association_output %>% dplyr::filter(association_output[,1]<as.numeric(rf_vibration_criteria_cutoff)) %>% dplyr::select(feature) %>% unlist %>% unname
-    #  }
-    #  if(model_type=='rf' and rf_use_RMSE==FALSE){
-    #  features_of_interest = association_output %>% dplyr::filter(association_output[,1]>as.numeric(rf_vibration_criteria_cutoff))%>% dplyr::select(feature) %>% unlist %>% unname
-    #  }
-    #  else{
-      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature) %>% unname %>% unlist
-      #}
+      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature) 
    }
     if(length(features_of_interest)==0){
       message('No significant features found, consider adjusting parameters or data and trying again.')
       return(output_to_return)
     }
     output_to_return[['features_to_vibrate_over']] = features_of_interest
-    vibration_output = compute_vibrations(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
+    vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
     output_to_return[['vibration_variables']] = vibration_output[[2]]
     analyzed_voe_data = analyze_voe_data(vibration_output)
     output_to_return[['analyzed_voe_data']] = analyzed_voe_data

@@ -1,5 +1,5 @@
 test_that("linear regression works", {
-	metadata = readRDS('../../data/metadata_for_test.rds')[[2]][[1]]
+	metadata = readRDS('../../data/metadata_for_test.rds')
 	abundance = readRDS('../../data/abundance_data_for_test.rds') 
 	abundance = abundance[,1:10]
 	bound_data = dplyr::tibble(dependent_variables=list(abundance),independent_variables=list(metadata),dsid=1)
@@ -7,7 +7,7 @@ test_that("linear regression works", {
 })
 
 test_that("logistic regression works", {
-	metadata = readRDS('../../data/metadata_for_test.rds')[[2]][[1]]
+	metadata = readRDS('../../data/metadata_for_test.rds')
 	abundance = readRDS('../../data/abundance_data_for_test.rds') 
 	abundance = abundance[,1:10]
 	bound_data = dplyr::tibble(dependent_variables=list(abundance),independent_variables=list(metadata),dsid=1)

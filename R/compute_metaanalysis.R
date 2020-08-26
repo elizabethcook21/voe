@@ -7,7 +7,7 @@ compute_metaanalysis <- function(df) {
     new_colname = features[[i]]
     df_sub = df %>% filter(feature==features[[i]])
     number_datasets = nrow(df_sub)
-    new_df =new_df %>% mutate(new = list(tryCatch(metagen(estimate,
+    new_df =new_df %>% mutate(new = list(tryCatch(meta::metagen(estimate,
                                                    std.error,
                                                    data = df_sub,
                                                    studlab = dataset_id,
@@ -26,8 +26,26 @@ compute_metaanalysis <- function(df) {
   return(new_df %>% select(-analysis)) # remove placeholder column
 }
 
+get_converged_metadfs <- function(meta_df) {
+  toremove=list()
+  count=0
+  for(x in 1:length(meta_df)){
+    if(class(meta_df[[x]][[1]])[[1]]!='metagen'){
+      toremove[as.character(count)]=x
+      count=count+1
+    }
+  }
+  if(length(toremove)>0){
+    meta_df=meta_df[-unname(unlist(toremove))]
+  }
+  return(meta_df)
+}
+
 get_summary_stats <- function(input_meta_df) {
-  meta_df <- get_good_metadfs(input_meta_df)
+  meta_df=get_converged_metadfs(input_meta_df)
+  if(ncol(input_meta_df)!=ncol(meta_df)){
+    message(paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe'))
+  }
   return(
     tibble(
       feature = colnames(meta_df),

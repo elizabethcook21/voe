@@ -1,9 +1,5 @@
 # Vibrates over a single maximal model for a single feature
-vibrate <- function(independent_variables, feature, dependent_variables,primary_variable,max_vibration_num ,dataset_id,proportion_cutoff) {
-  toremove = which(colSums(dependent_variables %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
-  message(paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
-  dependent_variables=dependent_variables %>% select(-(toremove+1))
-  removed=names(toremove)
+vibrate <- function(independent_variables, feature, dependent_variables,primary_variable,model_type,max_vibration_num,dataset_id,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule) {
   #iterate through each cohort for each feature
   tokeep = independent_variables %>% drop_na %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   ####LOG WHAT YOU'RE LOSING
@@ -16,32 +12,58 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(sampleID,feature),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) %>% drop_na() ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
   variables_to_vibrate=colnames(regression_df %>% dplyr::select(-sampleID,-primary_variable,-c(as.character(feature))))
     varset=rje::powerSet(variables_to_vibrate)
-    varset=varset[2:length(varset)]
       if(length(varset)>as.numeric(max_vibration_num)){
         varset=sample(varset,as.numeric(max_vibration_num))
     }
-    return(tibble(
+      return(tibble(
       independent_feature = feature,
       dataset_id = dataset_id,
       vars = varset,
-      full_fits = purrr::map(vars, function(y) tryCatch(broom::tidy(stats::lm(formula=as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),data = regression_df)),warning = function(w) w, error = function(e) e)),
+      full_fits = purrr::map(vars, function(y) tryCatch(broom::tidy(stats::glm(formula=as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),family=model_type,data = regression_df)),warning = function(w) w, error = function(e) e)),
       feature_fit = purrr::map(full_fits, function(x) tryCatch(dplyr::filter(x, term == primary_variable),warning = function(w) w,error = function(e) e)
       )
-    )
-    )
+    ))
+ #   if(model_type=='rf'){
+ #     return(tibble(
+ #     independent_feature = feature,
+ #     dataset_id = dataset_id,
+ #    vars = varset,
+ #     full_fits = purrr::map(vars, function(y) tryCatch(rf_vibration(feature_name,primary_variable,regression_df,mtry,num.trees,importance,min.node.size,splitrule)),warning = function(w) w, error = function(e) e))
+ #   )
+ #   }
+    #return(tibble(
+    #  independent_feature = feature,
+    #  dataset_id = dataset_id,
+    #  vars = varset,
+    #  full_fits = purrr::map(vars, function(y) tryCatch(broom::tidy(stats::lm(formula=as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),data = regression_df)),warning = function(w) w, error = function(e) e)),
+    #  feature_fit = purrr::map(full_fits, function(x) tryCatch(dplyr::filter(x, term == primary_variable),warning = function(w) w,error = function(e) e)
+    #  )
+    #)
+    #)
 }
 
-dataset_vibration <-function(subframe, features_of_interest,max_vibration_num, proportion_cutoff){
+dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule){
   message(paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
+  dep_sub = subframe[[1]]
+  in_sub = subframe[[2]]
+  toremove = which(colSums(dep_sub %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dep_sub)>proportion_cutoff)
+  message(paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
+  dep_sub=dep_sub %>% select(-(toremove+1))
   reduce( # map over all feature's want to vibrate for
-    purrr::map(features_of_interest, function(x) vibrate(subframe[[2]], x, subframe[[1]],primary_variable,max_vibration_num, subframe[[3]], proportion_cutoff)),
+    purrr::map(features_of_interest, function(x) vibrate(in_sub, x, dep_sub,primary_variable,model_type,max_vibration_num, subframe[[3]], proportion_cutoff)),#,mtry,num.trees,importance,min.node.size,splitrule)),
     rbind, #combine all features
     .init = NA_real_ # .init is supplied as the first value to start the accumulation in reduce, as o.w. reduce with throw error for empty starting value
   )
 }
 
-compute_vibrations <- function(bound_data, primary_variable, features_of_interest,max_vibration_num,proportion_cutoff) {
-  output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, features_of_interest,max_vibration_num, proportion_cutoff)))
+compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule){
+  output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff))) %>% dplyr::filter(!is.na(independent_feature))#,mtry,num.trees,importance,min.node.size,splitrule)))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-sampleID,-primary_variable) %>% colnames) %>% as.data.frame())))
   return(list('vibration_output'=output,'vibration_variables'=vibration_variables))
 }
+
+#rf_vibration <- function(feature_name,primary_variable,regression_df,mtry,num.trees,importance,min.node.size,splitrule){
+#  ranger_output = ranger::ranger(formula = as.formula(str_c("I(`", feature_name,"`) ~ ",primary_variable)), data = regression_df, mtry, num.trees, importance,min.node.size,splitrule)
+#  ranger_output_formatted = tibble(data.frame('feature' = feature_name,'oob_r2'=ranger_output$r.squared,'oob_prediction_error'=ranger_output$prediction.error))
+#  return(ranger_output_formatted)
+#}

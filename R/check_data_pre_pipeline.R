@@ -1,8 +1,11 @@
 #pre-flight checks
 
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis){
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis,model_type){
   message('Checking input data...')
   if(meta_analysis==TRUE){
+#    if(model_type=='rf'){
+#      message('You seem to be attempting to meta-analyze random forest output. This is not feasible with our current pipeline. Please change the meta_analysis parameter to FALSE and try again.')
+#    }
     message(paste('Primary variable of interest: ',primary_variable,sep=''))
     message(paste('FDR method: ',fdr_method,sep=''))
     message(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
@@ -13,7 +16,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_ind = map(independent_variables, function(x) ncol(x)-1)
     data_summary = bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% mutate(dataset_number=seq_along(num_features))    %>% mutate(max_models_per_feature = `Number of adjusters`*max_vibration_num)
     message('Preparing to run pipeline with the following parameters:')
-    message(data_summary)
+    print(data_summary)
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
     message(paste('This works out to a max of',as.character(max_models),'models across all features and, assuming 1% of all features being significant,',as.character(.01*max_models),'vibrations.'))
@@ -32,11 +35,12 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_ind = ncol(independent_variables) - 1
     data_summary = bind_cols(list('feature_num' = unlist(unname(num_features)),'sample_num' = unlist(unname(num_samples)),'adjuster_num' = unlist(unname(num_ind)))) %>% mutate(dataset=seq_along(num_features))
     message(paste('Preparing to run VoE pipeline for',as.character(num_features),'features,',as.character(num_samples),'samples, and',as.character(num_ind),'adjusters.'))
+    message(paste('Model type: ',model_type,sep=''))
     message(paste('Primary variable of interest: ',primary_variable,sep=''))
     message(paste('FDR method: ',fdr_method,sep=''))
     message(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
-    message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
     message(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
+    message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
     message(paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 1% of all features being significant,',as.character(.01*max_models),'vibrations.'))

@@ -39,12 +39,12 @@ library(voe)
 devtools::load_all()
 
 message('Parsing input data...')
-dependent_variable_locs = strsplit(gsub(' ','',opt$dependent_variables),',')
+dependent_variable_locs = strsplit(opt$dependent_variables,',')
 dependent_variables=list()
 
 if(length(dependent_variable_locs[[1]])>1){
 	for(i in seq_along(dependent_variable_locs[[1]]))
-		dependent_variables[[i]]=readRDS(dependent_variable_locs[[1]][[i]])
+		dependent_variables[[i]]=readRDS(trimws(dependent_variable_locs[[1]][[i]]))
 }
 if(length(dependent_variable_locs[[1]])==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])

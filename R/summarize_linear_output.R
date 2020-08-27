@@ -16,6 +16,7 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters) {
 
 find_confounders_linear <- function(voe_list_for_reg){
   ptype=unique(voe_list_for_reg$term)
+  print(voe_list_for_reg)
   voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(full_fits,std.error,statistic))
   voe_adjust_for_reg_ptype$estimate=abs(voe_adjust_for_reg_ptype$estimate)
   if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype)){

@@ -46,10 +46,10 @@ summarize_vibration_data_by_feature <- function(df){
 
 
 analyze_voe_data <- function(vibration_output){
-  print(vibration_output[[1]])
-  print(vibration_output[[2]])
   voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]])
+  print(voe_annotated)
   voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated) %>% dplyr::select(-vars)
+print(voe_unnested_annotated)
   summarized = summarize_vibration_data_by_feature(voe_unnested_annotated)
   confounder_analysis = find_confounders_linear(voe_unnested_annotated)
   return(list('summarized_vibration_output'= summarized,'confounder_analysis'=confounder_analysis,'data'=voe_unnested_annotated))

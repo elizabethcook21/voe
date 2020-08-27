@@ -1,6 +1,8 @@
 # Vibrates over a single maximal model for a single feature
 vibrate <- function(independent_variables, feature, dependent_variables,primary_variable,model_type,max_vibration_num,dataset_id,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule) {
   #iterate through each cohort for each feature
+  colnames(dependent_variables)[[1]]='sampleID'
+  colnames(independent_variables)[[1]]='sampleID'
   tokeep = independent_variables %>% tidyr::drop_na() %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   ####LOG WHAT YOU'RE LOSING
   todrop = setdiff(colnames(independent_variables),tokeep)

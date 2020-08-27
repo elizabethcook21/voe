@@ -14,10 +14,12 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
 
 run_associations <- function(x,primary_variable,model_type,proportion_cutoff){
   dependent_variables <- dplyr::as_tibble(x[[1]])
+  colnames(dependent_variables)[[1]]='sampleID'
   toremove = which(colSums(dependent_variables %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
   message(paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
   dependent_variables=dependent_variables %>% dplyr::select(-(toremove+1))
   independent_variables <- dplyr::as_tibble(x[[2]])
+  colnames(independent_variables)[[1]]='sampleID'
   message(paste('Computing',as.character(ncol(dependent_variables)-1),'associations for dataset',as.character(unname(unlist(x[[3]])))))
   colnames(dependent_variables)[1]='sampleID'
   colnames(independent_variables)[1]='sampleID'

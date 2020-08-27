@@ -2,7 +2,6 @@
 ###mixed effects model to look at confounder analysis
 
 filter_unnest_feature_vib <- function(vib_df) {
-  print(vib_df %>% dplyr::slice((purrr::map_lgl(vib_df$feature_fit, ~class(.)[[1]]))))
   return(vib_df %>% dplyr::slice(which(purrr::map_lgl(vib_df$feature_fit, ~class(.)[[1]] == "tbl_df"))) %>% tidyr::unnest(feature_fit))
 }
 

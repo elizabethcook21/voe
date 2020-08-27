@@ -54,7 +54,7 @@ independent_variable_locs = strsplit(opt$independent_variables,',')
 independent_variables=list()
 if(length(independent_variable_locs[[1]])>1){
 	for(i in seq_along(independent_variable_locs[[1]]))
-		independent_variables[[i]]=readRDS(independent_variable_locs[[1]][[i]])
+		independent_variables[[i]]=readRDS(trimws(independent_variable_locs[[1]][[i]]))
 }
 if(length(independent_variable_locs[[1]])==1){
 	independent_variables=readRDS(independent_variable_locs[[1]])

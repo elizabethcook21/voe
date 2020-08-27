@@ -17,7 +17,7 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
       if(length(varset)>as.numeric(max_vibration_num)){
         varset=sample(varset,as.numeric(max_vibration_num))
     }
-    print(independent_variables)
+      print(purrr::map(varset, function(y) tryCatch(broom::tidy(stats::glm(formula=as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),family=model_type,data = regression_df)),warning = function(w) w, error = function(e) e)))
       return(tibble::tibble(
       independent_feature = feature,
       dataset_id = dataset_id,

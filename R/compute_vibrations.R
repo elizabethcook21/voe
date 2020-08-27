@@ -31,9 +31,6 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
   message(paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
   dep_sub = subframe[[1]]
   in_sub = subframe[[2]]
-  toremove = which(colSums(dep_sub %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dep_sub)>proportion_cutoff)
-  message(paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
-  dep_sub=dep_sub %>% dplyr::select(-(toremove+1))
   purrr::reduce( # map over all feature's want to vibrate for
     purrr::map(features_of_interest, function(x) vibrate(in_sub, x, dep_sub,primary_variable,model_type,max_vibration_num, subframe[[3]], proportion_cutoff)),#,mtry,num.trees,importance,min.node.size,splitrule)),
     rbind, #combine all features

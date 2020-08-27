@@ -46,6 +46,8 @@ summarize_vibration_data_by_feature <- function(df){
 
 
 analyze_voe_data <- function(vibration_output){
+  print(vibration_output[[1]])
+  print(vibration_output[[2]])
   voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]])
   voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated) %>% dplyr::select(-vars)
   summarized = summarize_vibration_data_by_feature(voe_unnested_annotated)

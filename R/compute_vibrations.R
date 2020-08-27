@@ -17,7 +17,6 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
       if(length(varset)>as.numeric(max_vibration_num)){
         varset=sample(varset,as.numeric(max_vibration_num))
     }
-      print(purrr::map(varset, function(y) tryCatch(broom::tidy(stats::glm(formula=as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),family=model_type,data = regression_df)),warning = function(w) w, error = function(e) e)))
       return(tibble::tibble(
       independent_feature = feature,
       dataset_id = dataset_id,
@@ -41,6 +40,7 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
 
 compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule){
   output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff))) 
+  print(output)
   output = output %>% dplyr::filter(!is.na(independent_feature))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-sampleID,-primary_variable) %>% colnames) %>% as.data.frame())))
   return(list('vibration_output'=output,'vibration_variables'=vibration_variables))

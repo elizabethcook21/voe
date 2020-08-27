@@ -39,7 +39,7 @@ library(voe)
 devtools::load_all()
 
 message('Parsing input data...')
-dependent_variable_locs = strsplit(opt$dependent_variables,',')
+dependent_variable_locs = strsplit(gsub(' ','',opt$dependent_variables),',')
 dependent_variables=list()
 
 if(length(dependent_variable_locs[[1]])>1){

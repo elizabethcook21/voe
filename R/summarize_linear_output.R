@@ -2,6 +2,7 @@
 ###mixed effects model to look at confounder analysis
 
 filter_unnest_feature_vib <- function(vib_df) {
+  print(vib_df)
   return(vib_df %>% dplyr::slice(which(purrr::map_lgl(vib_df$feature_fit, ~class(.)[[1]] == "tbl_df"))) %>% tidyr::unnest(feature_fit))
 }
 
@@ -27,7 +28,6 @@ find_confounders_linear <- function(voe_list_for_reg){
     fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . - estimate - p.value))
     fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
   }
-  #saveRDS(fit_estimate_forplot,paste('litvib_only_disease_specific_confounders_estimate_',ptype,'.rds',sep=''))
   return(fit_estimate_forplot)
 }
 
@@ -47,9 +47,7 @@ summarize_vibration_data_by_feature <- function(df){
 
 analyze_voe_data <- function(vibration_output){
   voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]])
-  print(voe_annotated)
   voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated) %>% dplyr::select(-vars)
-print(voe_unnested_annotated)
   summarized = summarize_vibration_data_by_feature(voe_unnested_annotated)
   confounder_analysis = find_confounders_linear(voe_unnested_annotated)
   return(list('summarized_vibration_output'= summarized,'confounder_analysis'=confounder_analysis,'data'=voe_unnested_annotated))

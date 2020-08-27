@@ -17,6 +17,7 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
       if(length(varset)>as.numeric(max_vibration_num)){
         varset=sample(varset,as.numeric(max_vibration_num))
     }
+    print(independent_variables)
       return(tibble::tibble(
       independent_feature = feature,
       dataset_id = dataset_id,

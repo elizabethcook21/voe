@@ -50,6 +50,7 @@ if(length(dependent_variable_locs[[1]])>1){
 }
 if(length(dependent_variable_locs[[1]])==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])
+  colnames(dependent_variables)[1]='sampleID'
 }
 
 independent_variable_locs = strsplit(opt$independent_variables,',')
@@ -62,6 +63,7 @@ if(length(independent_variable_locs[[1]])>1){
 }
 if(length(independent_variable_locs[[1]])==1){
 	independent_variables=readRDS(independent_variable_locs[[1]])
+  colnames(independent_variables)[1]='sampleID'
 }
 
 message('Data parsed and loaded, running pipeline.')

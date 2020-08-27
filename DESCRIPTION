@@ -13,6 +13,7 @@ Imports:
     tidyverse,
     readxl,
     dplyr,
+    log4r,
     lme4,
     broom.mixed,
     lmerTest,

@@ -16,6 +16,8 @@
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
 full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.99,meta_analysis=FALSE, model_type='gaussian'){#rf_vibration_criteria = 'oob_r2', rf_vibration_criteria_cutoff = 0.2, mtry = 1, num.trees = 500 , importance ='none', min.node.size = 5, splitrule = 'variance'){
+  logger <- initialize_logger()
+
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
     message('Identified multiple input datasets, preparing to run meta-analysis.')
@@ -41,7 +43,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
     }
     else{
-      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature) 
+      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
    }
     if(length(features_of_interest)==0){
       message('No significant features found, consider adjusting parameters or data and trying again.')

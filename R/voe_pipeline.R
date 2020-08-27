@@ -44,6 +44,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     }
     else{
       features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
+print(features_of_interest)
    }
     if(length(features_of_interest)==0){
       message('No significant features found, consider adjusting parameters or data and trying again.')

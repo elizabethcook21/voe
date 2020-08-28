@@ -40,6 +40,7 @@ library(voe)
 devtools::load_all()
 
 message('Parsing input data...')
+print(dependent_variable_locs)
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
 

@@ -47,9 +47,8 @@ if(length(dependent_variable_locs[[1]])>1){
 	for(i in seq_along(dependent_variable_locs[[1]]))
     data = tibble::tibble(readRDS(trimws(dependent_variable_locs[[1]][[i]])))
     colnames(data)[1]='sampleID'
-    print(dim(data))
-
-		dependent_variables[[i]] = data
+    print(i)
+		dependent_variables[[dependent_variable_locs[[1]][[i]]]] = data
 }
 if(length(dependent_variable_locs[[1]])==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])
@@ -59,12 +58,13 @@ if(length(dependent_variable_locs[[1]])==1){
 independent_variable_locs = strsplit(as.character(opt$independent_variables),',')
 independent_variables=list()
 
+
 if(length(independent_variable_locs[[1]])>1){
 	for(i in seq_along(independent_variable_locs[[1]]))
     data = tibble::tibble(readRDS(trimws(independent_variable_locs[[1]][[i]])))
     colnames(data)[1]='sampleID'
-    print(dim(data))
-    independent_variables[[i]] = data
+    print(i)
+    independent_variables[[dependent_variable_locs[[1]][[i]]]] = data
 }
 if(length(independent_variable_locs[[1]])==1){
 	independent_variables=readRDS(independent_variable_locs[[1]])

@@ -7,7 +7,6 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
   ####LOG WHAT YOU'RE LOSING
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
-    message('Dropping the following variables due to either lacking multiple levels or NaN values:')
     print(todrop)
   }
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))

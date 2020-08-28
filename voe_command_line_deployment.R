@@ -46,14 +46,15 @@ dependent_variables=list()
 if(length(unlist(dependent_variable_locs))>1){
 	for(i in unlist(dependent_variable_locs)){
     data = tibble::tibble(readRDS(trimws(i)))
-    #colnames(data)[1]='sampleID'
+    print(colnames(data))
+    colnames(data)[1]='sampleID'
 		dependent_variables[[i]] = data
   }
 }
 
 if(length(unlist(dependent_variable_locs))==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])
-  #colnames(dependent_variables)[1]='sampleID'
+  colnames(dependent_variables)[1]='sampleID'
 }
 
 independent_variable_locs = strsplit(as.character(opt$independent_variables),',')
@@ -62,14 +63,14 @@ independent_variables=list()
 if(length(unlist(independent_variable_locs))>1){
   for(i in unlist(independent_variable_locs)){
     data = tibble::tibble(readRDS(trimws(i)))
-    #colnames(data)[1]='sampleID'
+    colnames(data)[1]='sampleID'
     independent_variables[[i]] = data
   }
 }
 
 if(length(unlist(independent_variable_locs))==1){
   independent_variables=readRDS(independent_variable_locs[[1]])
-  #colnames(independent_variables)[1]='sampleID'
+  colnames(independent_variables)[1]='sampleID'
 }
 
 message('Data parsed and loaded, running pipeline.')

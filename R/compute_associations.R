@@ -28,6 +28,10 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   if(length(todrop)>1){
     message('Dropping the following variables due to either lacking multiple levels or containing NaN values:')
     print(todrop)
+    if(primary_variable %in% todrop){
+      print('One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
+      return('failed')
+    }
   }
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
   if(ncol(independent_variables)==2){

@@ -36,6 +36,9 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     Sys.sleep(2)
     message('Deploying initial associations...')
     association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
+    if(association_output_full == 'failed'){
+      return('Deployment halted.')
+    }
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
     association_output=association_output_full[['output']]

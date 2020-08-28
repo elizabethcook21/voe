@@ -12,7 +12,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
     ))
 }
 
-run_associations <- function(x,primary_variable,model_type,proportion_cutoff){
+run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate){
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
   toremove = which(colSums(dependent_variables %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
@@ -28,15 +28,27 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff){
   if(length(todrop)>1){
     message('Dropping the following variables due to either lacking multiple levels or containing NaN values:')
     print(todrop)
+    if(primary_variable %in% todrop){
+      print('One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
+    }
   }
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
+  if(ncol(independent_variables)==2){
+    vibrate=FALSE
+  }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff)) %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
   out = out %>% dplyr::mutate(dataset_id=x[[3]])
-  return(out)
+  return(list('output' = out,'vibrate' = vibrate))
 }
 
-compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff){
-    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff))
-    output = dplyr::bind_rows(output)
-  return(output)
+compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate){
+    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate))
+    output_regs = map(output, function(x) x[[1]])
+    output_vib = unlist(unname(unique(map(output, function(x) x[[2]]))))
+    if(FALSE %in% output_vib & vibrate!=FALSE){
+      output_vib=FALSE
+      message('For at least one dataset, we dropped all the variables that you could possible vibrate over due to NAs or lacking multiple levels. Vibrate parameter being set to FALSE.')
+    }
+    output_regs = dplyr::bind_rows(output_regs)
+  return(list('output'=output_regs,'vibrate'=output_vib))
 }

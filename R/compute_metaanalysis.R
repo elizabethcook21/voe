@@ -44,7 +44,7 @@ get_converged_metadfs <- function(meta_df) {
 get_summary_stats <- function(input_meta_df) {
   meta_df=get_converged_metadfs(input_meta_df)
   if(ncol(input_meta_df)!=ncol(meta_df)){
-    message(paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe'))
+    message(paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe.'))
   }
   return(
     tibble::tibble(

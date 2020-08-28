@@ -18,11 +18,12 @@ find_confounders_linear <- function(voe_list_for_reg){
   ptype=unique(voe_list_for_reg$term)
   voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(full_fits,std.error,statistic))
   voe_adjust_for_reg_ptype$estimate=abs(voe_adjust_for_reg_ptype$estimate)
-  if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype)){
+  if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype) & !(1 %in% unique(unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature)))))){
     fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . +(1|independent_feature) -independent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
     fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
   }
   else{
+    message('Note: Some features only had 1 vibration associated with them, likely due to a model failure or a paucity of vibration features. This means your confounder analysis will be done will a regular linear model, instead of a mixed effect one. See the documentation for more details.')
     fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . - estimate - p.value))
     fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
   }

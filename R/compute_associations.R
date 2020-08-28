@@ -43,8 +43,8 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate))
-    output_regs = map(output, function(x) x[[1]])
-    output_vib = unlist(unname(unique(map(output, function(x) x[[2]]))))
+    output_regs = purrr::map(output, function(x) x[[1]])
+    output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))
     if(FALSE %in% output_vib & vibrate!=FALSE){
       output_vib=FALSE
       message('For at least one dataset, we dropped all the variables that you could possible vibrate over due to NAs or lacking multiple levels. Vibrate parameter being set to FALSE.')

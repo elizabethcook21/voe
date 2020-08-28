@@ -57,10 +57,10 @@ if(length(dependent_variable_locs[[1]])==1){
 independent_variable_locs = strsplit(as.character(opt$independent_variables),',')
 independent_variables=list()
 
-
 if(length(independent_variable_locs[[1]])>1){
 	for(i in seq_along(independent_variable_locs[[1]]))
-  print(trimws(independent_variable_locs[[1]][[i]]))
+  print((independent_variable_locs[[1]][[i]]))
+  print(i)
 		data = tibble:as_tibble(readRDS(trimws(independent_variable_locs[[1]][[i]])))
     colnames(data)[1]='sampleID'
     independent_variables[[i]]=data 

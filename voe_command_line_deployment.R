@@ -56,6 +56,9 @@ if(length(dependent_variable_locs[[1]])==1){
 
 independent_variable_locs = strsplit(as.character(opt$independent_variables),',')
 independent_variables=list()
+
+print(independent_variable_locs[[1]][[3]])
+
 if(length(independent_variable_locs[[1]])>1){
 	for(i in seq_along(independent_variable_locs[[1]]))
 		data = tibble:as_tibble(readRDS(trimws(independent_variable_locs[[1]][[i]])))

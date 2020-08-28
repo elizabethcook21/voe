@@ -43,12 +43,9 @@ message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
 
-print(dependent_variable_locs[[1]][[1]])
-
-
 if(length(dependent_variable_locs[[1]])>1){
 	for(i in seq_along(dependent_variable_locs[[1]]))
-    data = readRDS(trimws(dependent_variable_locs[[1]][[i]]))
+    data = tibble::tibble(readRDS(trimws(dependent_variable_locs[[1]][[i]])))
     colnames(data)[1]='sampleID'
 		dependent_variables[[i]] = data
 }
@@ -57,11 +54,10 @@ if(length(dependent_variable_locs[[1]])==1){
   colnames(dependent_variables)[1]='sampleID'
 }
 
-independent_variable_locs = strsplit(opt$independent_variables,',')
+independent_variable_locs = strsplit(as.character(opt$independent_variables),',')
 independent_variables=list()
 if(length(independent_variable_locs[[1]])>1){
 	for(i in seq_along(independent_variable_locs[[1]]))
-    print(trimws(independent_variable_locs[[1]][[i]]))
 		data = tibble:as_tibble(readRDS(trimws(independent_variable_locs[[1]][[i]])))
     colnames(data)[1]='sampleID'
     independent_variables[[i]]=data 

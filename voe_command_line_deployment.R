@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-library(getopt)
+suppressMessages(library(getopt))
 
 ### arguments
 spec = matrix(c(
@@ -33,10 +33,10 @@ if ( is.null(opt$model_type ) ) { opt$model_type = 'gaussian' }
 if ( is.null(opt$meta_analysis ) ) { opt$meta_analysis = FALSE }
 
 # run pipeline
-library(devtools)
-library(tidyverse)
+suppressMessages(library(devtools))
+suppressMessages(library(tidyverse))
 devtools::install_local(opt$path_to_repository, force=TRUE)
-library(voe)
+suppressMessages(library(voe))
 devtools::load_all()
 
 message('Parsing input data...')

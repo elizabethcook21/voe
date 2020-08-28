@@ -36,8 +36,8 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     Sys.sleep(2)
     message('Deploying initial associations...')
     association_output <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
-    output_to_return[['initial_association_output']] = association_output[['output']]
-    vibrate=association_output[['vibrate']]
+    output_to_return[['initial_association_output']] = association_output$output
+    vibrate=association_output$vibrate
     if(meta_analysis == TRUE){
       metaanalysis <- compute_metaanalysis(association_output)
       metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)

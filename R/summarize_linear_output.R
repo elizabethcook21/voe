@@ -30,6 +30,8 @@ find_confounders_linear <- function(voe_list_for_reg){
 }
 
 summarize_vibration_data_by_feature <- function(df){
+  print(df)
+  print(unique(df$independent_feature))
   p <- c(0.01,.5,.99)
   p_names <- purrr::map_chr(p, ~paste0('estimate_quantile_',.x*100, "%"))
   p_funs <- purrr::map(p, ~purrr::partial(quantile, probs = .x, na.rm = TRUE)) %>% purrr::set_names(nm = p_names)

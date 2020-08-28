@@ -36,6 +36,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff)) %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
   out = out %>% dplyr::mutate(dataset_id=x[[3]])
+  print(out)
   return(list('output' = out,'vibrate' = vibrate))
 }
 

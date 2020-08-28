@@ -36,9 +36,9 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     Sys.sleep(2)
     message('Deploying initial associations...')
     association_output <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
-    print(association_output)
     output_to_return[['initial_association_output']] = association_output[['output']]
     vibrate=association_output[['vibrate']]
+    print(vibrate)
     if(meta_analysis == TRUE){
       metaanalysis <- compute_metaanalysis(association_output)
       metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)
@@ -53,6 +53,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       return(output_to_return)
     }
     if(vibrate==TRUE){
+      print(features_of_interest)
       output_to_return[['features_to_vibrate_over']] = features_of_interest
       vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
       output_to_return[['vibration_variables']] = vibration_output[[2]]

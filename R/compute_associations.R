@@ -32,6 +32,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
   if(ncol(independent_variables==2)){
     print(independent_variables)
+    print(ncol(independent_variables))
     vibrate=FALSE
     message('We dropped all the variables that you could possible vibrate over due to NAs or lacking multiple levels. Vibrate parameter being set to FALSE.')
   }

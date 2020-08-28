@@ -43,7 +43,7 @@ message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
 
-print(length(unlist(dependent_variable_locs))>)
+print(length(unlist(dependent_variable_locs))) 
 
 if(length(unlist(dependent_variable_locs))>1){
 	for(i in unlist(dependent_variable_locs)){

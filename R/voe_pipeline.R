@@ -20,10 +20,10 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   logger <- initialize_logger()
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
-    message('Identified multiple input datasets, preparing to run meta-analysis.')
+    log4r::info(logger,'Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
     if(meta_analysis==FALSE){
-      return(message('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
+      return(log4r::info(logger,'The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
     }
   }
   else{
@@ -33,7 +33,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis,model_type)#, mtry, num.trees, importance,min.node.size,splitrule)
   if(passed==TRUE){
     Sys.sleep(2)
-    message('Deploying initial associations...')
+    log4r::info(logger,'Deploying initial associations...')
     association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
@@ -48,7 +48,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
    }
     if(length(unlist(unname(features_of_interest)))==0){
-      message('No significant features found, consider adjusting parameters or data and trying again.')
+      log4r::info(logger,'No significant features found, consider adjusting parameters or data and trying again.')
       return(output_to_return)
     }
     if(vibrate==TRUE){
@@ -58,7 +58,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       analyzed_voe_data = analyze_voe_data(vibration_output)
       output_to_return[['analyzed_voe_data']] = analyzed_voe_data
     }
-    message('Done!')
+    log4r::info(logger,'Done!')
     return(output_to_return)
   }
 }

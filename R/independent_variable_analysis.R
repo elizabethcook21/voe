@@ -31,9 +31,6 @@ ind_var_analysis <- function(independent_variables){
       )
     }
   }
-  #if(colnames(ind_var)[1] != 'sampleID' || colnames(ind_var)[1] != 'SampleID'){
-  #  return("Error. The first column is not named SampleID")
-  #}
 
 }
 
@@ -51,8 +48,3 @@ makeHistogram <- function(table, columnName){
     ggplot2::theme_light()
   try(ggplot2::ggsave(paste0(columnName, "_histogram.png")))
 }
-
-metadata <- readRDS('~/OneDrive/Harvard SIBMI/voe/data/metadata_for_test.rds')
-metadata <- metadata[2:length(metadata)]
-expect_error(ind_var_analysis(metadata), regexp = NA)
-ind_var_analysis(metadata)

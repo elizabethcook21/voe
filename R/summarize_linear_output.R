@@ -18,12 +18,13 @@ find_confounders_linear <- function(voe_list_for_reg){
   ptype=unique(voe_list_for_reg$term)
   voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(full_fits,std.error,statistic))
   voe_adjust_for_reg_ptype$estimate=abs(voe_adjust_for_reg_ptype$estimate)
-  print(table(voe_adjust_for_reg_ptype$independent_feature))
-  if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype)){
+  print(unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature))))
+  if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype) and !(1 %in% unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature))))){
     fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . +(1|independent_feature) -independent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
     fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
   }
   else{
+    message('Fitting a non-mixed effects model due to enough vibrations failing that only some features only have 1 model associated with them.')
     fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . - estimate - p.value))
     fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
   }

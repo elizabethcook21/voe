@@ -43,21 +43,15 @@ message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
 
-for(value in unlist(dependent_variable_locs)){
-  print('here')
-  print(value)
-}
 
-
-"""
-if(length(dependent_variable_locs[[1]])>1){
-	for(i in seq_along(dependent_variable_locs[[1]]))
-    data = tibble::tibble(readRDS(trimws(dependent_variable_locs[[1]][[i]])))
+if(length(unlist(dependent_variable_locs))>1){
+	for(i in unlist(dependent_variable_locs)){
+    data = tibble::tibble(readRDS(trimws(i)))
     colnames(data)[1]='sampleID'
     print(i)
-		dependent_variables[[dependent_variable_locs[[1]][[i]]]] = data
+		dependent_variables[i] = data
 }
-if(length(dependent_variable_locs[[1]])==1){
+if(length(unlist(dependent_variable_locs))==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])
   colnames(dependent_variables)[1]='sampleID'
 }
@@ -65,16 +59,15 @@ if(length(dependent_variable_locs[[1]])==1){
 independent_variable_locs = strsplit(as.character(opt$independent_variables),',')
 independent_variables=list()
 
-
-if(length(independent_variable_locs[[1]])>1){
-	for(i in seq_along(independent_variable_locs[[1]]))
-    data = tibble::tibble(readRDS(trimws(independent_variable_locs[[1]][[i]])))
+if(length(unlist(independent_variable_locs))>1){
+  for(i in unlist(independent_variable_locs)){
+    data = tibble::tibble(readRDS(trimws(i)))
     colnames(data)[1]='sampleID'
     print(i)
-    independent_variables[[dependent_variable_locs[[1]][[i]]]] = data
+    independent_variables[i] = data
 }
-if(length(independent_variable_locs[[1]])==1){
-	independent_variables=readRDS(independent_variable_locs[[1]])
+if(length(unlist(independent_variable_locs))==1){
+  independent_variables=readRDS(independent_variable_locs[[1]])
   colnames(independent_variables)[1]='sampleID'
 }
 
@@ -83,7 +76,7 @@ message('Data parsed and loaded, running pipeline.')
 output = voe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis, model_type=opt$model_type)
 
 saveRDS(output,opt$output_path)
-"""
+
 # q(status=0)
 
 

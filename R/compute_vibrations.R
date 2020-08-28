@@ -1,15 +1,12 @@
 # Vibrates over a single maximal model for a single feature
 vibrate <- function(independent_variables, feature, dependent_variables,primary_variable,model_type,max_vibration_num,dataset_id,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule) {
-  #iterate through each cohort for each feature
   colnames(dependent_variables)[[1]]='sampleID'
   colnames(independent_variables)[[1]]='sampleID'
   tokeep = independent_variables %>% tidyr::drop_na() %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
-  ####LOG WHAT YOU'RE LOSING
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
-    print(todrop)
+    independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
   }
-  independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(sampleID,feature),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) %>% tidyr::drop_na() ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
   variables_to_vibrate=colnames(regression_df %>% dplyr::select(-sampleID,-primary_variable,-c(as.character(feature))))
     varset=rje::powerSet(variables_to_vibrate)

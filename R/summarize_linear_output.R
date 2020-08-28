@@ -30,17 +30,24 @@ find_confounders_linear <- function(voe_list_for_reg){
 }
 
 summarize_vibration_data_by_feature <- function(df){
-  print(df)
-  print(unique(df$independent_feature))
   p <- c(0.01,.5,.99)
+  print(1)
   p_names <- purrr::map_chr(p, ~paste0('estimate_quantile_',.x*100, "%"))
+  print(2)
   p_funs <- purrr::map(p, ~purrr::partial(quantile, probs = .x, na.rm = TRUE)) %>% purrr::set_names(nm = p_names)
+  print(3)
   model_counts = df %>% dplyr::count(independent_feature) %>% dplyr::rename(number_of_models=n)
+  print(4)
   df_estimates = suppressMessages(df %>% dplyr::group_by(independent_feature) %>% dplyr::summarize_at(dplyr::vars(estimate), tibble::lst(!!!p_funs)) %>% dplyr::mutate(estimate_diff_99_1 = `estimate_quantile_99%`-`estimate_quantile_1%`,janus_effect=df %>% dplyr::group_by(independent_feature) %>% dplyr::summarise(janus_effect = sum(estimate > 0, na.rm = TRUE)/sum(is.finite(estimate), na.rm = TRUE)) %>% dplyr::ungroup() %>% dplyr::select(janus_effect) %>% unname %>% unlist))
+  print(5)
   p_names <- purrr::map_chr(p, ~paste0('pval_quantile_',.x*100, "%"))
+  print(6)
   p_funs <- purrr::map(p, ~purrr::partial(quantile, probs = .x, na.rm = TRUE)) %>% purrr::set_names(nm = p_names)
+  print(7)
   df_pval = df %>% dplyr::group_by(independent_feature) %>% dplyr::summarize_at(dplyr::vars(p.value), tibble::lst(!!!p_funs)) %>% dplyr::mutate(pvalue_diff_99_1 = `pval_quantile_99%`-`pval_quantile_1%`)
+  print(8)
   summarized_voe_data=dplyr::bind_cols(model_counts, df_estimates %>% dplyr::select(-independent_feature),df_pval %>% dplyr::select(-independent_feature))
+  print(9)
   return(summarized_voe_data)
 }
 

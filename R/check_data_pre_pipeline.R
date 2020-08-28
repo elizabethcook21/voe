@@ -43,9 +43,9 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
-    message(paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 1% of all features being significant,',as.character(.01*max_models),'vibrations.'))
-    if(max_models>1000000){
-      message('Warning: a run at this scale (over 1 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
+    message(paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 0.1% of all features being significant,',as.character(.001*max_models),'vibrations.'))
+    if(max_models>10000000){
+      message('Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
       Sys.sleep(2)
     }
   message('Checking for illegal variable names...')

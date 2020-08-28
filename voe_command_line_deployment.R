@@ -45,7 +45,7 @@ dependent_variables=list()
 
 
 
-print(dependent_variable_locs[[1]][[1]]))
+print(dependent_variable_locs[[1]][[1]])
 
 
 if(length(dependent_variable_locs[[1]])>1){

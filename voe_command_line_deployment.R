@@ -46,7 +46,6 @@ dependent_variables=list()
 if(length(unlist(dependent_variable_locs))>1){
 	for(i in unlist(dependent_variable_locs)){
     data = tibble::tibble(readRDS(trimws(i)))
-    print(colnames(data))
     colnames(data)[1]='sampleID'
 		dependent_variables[[i]] = data
   }

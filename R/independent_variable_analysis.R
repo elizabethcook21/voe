@@ -13,23 +13,46 @@ ind_var_analysis <- function(independent_variables){
   # This should probably be changed in the future to a more human readable file type like txt, html, pdf, or excel
   saveRDS(columnSummaries, 'metadata_information.rds')
   log4r::info(my_logger, 'You should have gotten a summary of all the columns in your table, for example their means and number of variables.')
-  for(i in colnames(ind_var[2:length(ind_var)])){
-    # if(typeof(ind_var[[i]] == "character")){
-    #   print("make a bar graph")
-    # ggplot(tibbleData, aes(x=dataset, fill = Gender)) +
-    #   geom_bar(position=position_dodge()) +
-    #   theme_light()
-    # } else {
-    #   print("make a histogram")
-    # ggplot(tibbleData, aes(x=BMI, fill=dataset, color=dataset)) +
-    #   geom_histogram() +
-    #   theme_light() +
-    #   xlab('BMI (kg/m2)')
-    # }
-  }
+  # Get the different types of columns by using summarise_all, then convert to a named list
+  browser()
 
+  colTypes <- ind_var %>%
+    dplyr::summarise_all(class)
+  colTypes <- as.list(colTypes)
+  for(i in 1:length(colTypes)){
+    #columnOfData <- ind_var[names(colTypes[i])
+    if(colTypes[i] == "factor"){
+      try(
+        makeBarGraph(ind_var, names(colTypes[i]))
+      )
+    } else {
+      try(
+        makeHistogram(ind_var[names(colTypes[i])], names(colTypes[i]))
+      )
+    }
+  }
   #if(colnames(ind_var)[1] != 'sampleID' || colnames(ind_var)[1] != 'SampleID'){
   #  return("Error. The first column is not named SampleID")
   #}
 
 }
+
+
+makeBarGraph <- function(table, columnName){
+  ggplot2::ggplot(table, ggplot2::aes_string(x=columnName, fill = columnName)) +
+    ggplot2::geom_bar() +
+    ggplot2::theme_light()
+  try(ggplot2::ggsave(paste0(columnName,"_bargraph.png")))
+}
+
+makeHistogram <- function(table, columnName){
+  ggplot2::ggplot(table, ggplot2::aes(x=columnName)) +
+    ggplot2::geom_histogram() +
+    ggplot2::theme_light()
+  try(ggplot2::ggsave(paste0(columnName, "_histogram.png")))
+}
+
+metadata <- readRDS('~/OneDrive/Harvard SIBMI/voe/data/metadata_for_test.rds')
+metadata <- metadata[2:length(metadata)]
+expect_error(ind_var_analysis(metadata), regexp = NA)
+ind_var_analysis(metadata)

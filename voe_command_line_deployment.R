@@ -42,9 +42,9 @@ devtools::load_all()
 message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
+  print('here')
 
 if(length(unlist(dependent_variable_locs))>1){
-  print('here')
 	for(i in unlist(dependent_variable_locs)){
     print(i)
     data = tibble::tibble(readRDS(trimws(i)))

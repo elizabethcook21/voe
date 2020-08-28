@@ -14,7 +14,6 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
     num_ind = purrr::map(independent_variables, function(x) ncol(x)-1)
-    print(num_features)
     data_summary = dplyr::bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset_number=seq_along(num_features))    %>% dplyr::mutate(max_models_per_feature = `Number of adjusters`*max_vibration_num)
     message('Preparing to run pipeline with the following parameters:')
     print(data_summary)

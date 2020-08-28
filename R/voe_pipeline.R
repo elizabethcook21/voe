@@ -22,7 +22,6 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   if(inherits(dependent_variables, "list")==TRUE){
     message('Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
-  print(bound_data)
     if(meta_analysis==FALSE){
       return(message('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
     }
@@ -53,6 +52,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     output_to_return[['features_to_vibrate_over']] = features_of_interest
     vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
     output_to_return[['vibration_variables']] = vibration_output[[2]]
+    print(vibration_output)
     analyzed_voe_data = analyze_voe_data(vibration_output)
     output_to_return[['analyzed_voe_data']] = analyzed_voe_data
     message('Done!')

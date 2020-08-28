@@ -18,7 +18,6 @@
 #' voepipeline(metadata, abundance_data, mapping)
 full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian'){
   logger <- initialize_logger()
-
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
     message('Identified multiple input datasets, preparing to run meta-analysis.')
@@ -36,9 +35,6 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     Sys.sleep(2)
     message('Deploying initial associations...')
     association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
-    if(association_output_full == 'failed'){
-      return('Deployment halted.')
-    }
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
     association_output=association_output_full[['output']]

@@ -30,7 +30,6 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
     print(todrop)
     if(primary_variable %in% todrop){
       print('One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
-      return('failed')
     }
   }
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))

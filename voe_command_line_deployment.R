@@ -43,8 +43,8 @@ dependent_variable_locs = strsplit(opt$dependent_variables,',')
 dependent_variables=list()
 
 if(length(dependent_variable_locs[[1]])>1){
-  print(trimws(dependent_variable_locs[[1]][[i]]))
 	for(i in seq_along(dependent_variable_locs[[1]]))
+  print(trimws(dependent_variable_locs[[1]][[i]]))
     data = readRDS(trimws(dependent_variable_locs[[1]][[i]]))
     colnames(data)[1]='sampleID'
 		dependent_variables[[i]] = data

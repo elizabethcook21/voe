@@ -42,7 +42,6 @@ devtools::load_all()
 message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
-  print('here')
 
 if(length(unlist(dependent_variable_locs))>1){
 	for(i in unlist(dependent_variable_locs)){
@@ -51,7 +50,9 @@ if(length(unlist(dependent_variable_locs))>1){
     colnames(data)[1]='sampleID'
     print(i)
 		dependent_variables[i] = data
+  }
 }
+
 if(length(unlist(dependent_variable_locs))==1){
 	dependent_variables=readRDS(dependent_variable_locs[[1]])
   colnames(dependent_variables)[1]='sampleID'
@@ -66,7 +67,9 @@ if(length(unlist(independent_variable_locs))>1){
     colnames(data)[1]='sampleID'
     print(i)
     independent_variables[i] = data
+  }
 }
+
 if(length(unlist(independent_variable_locs))==1){
   independent_variables=readRDS(independent_variable_locs[[1]])
   colnames(independent_variables)[1]='sampleID'

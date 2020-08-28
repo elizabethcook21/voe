@@ -48,6 +48,7 @@ if(length(dependent_variable_locs[[1]])>1){
     print(trimws(dependent_variable_locs[[1]][[i]]))
     data = tibble:as_tibble(readRDS(trimws(dependent_variable_locs[[1]][[i]])))
     colnames(data)[1]='sampleID'
+    print('here')
 		dependent_variables[[i]] = data
 }
 if(length(dependent_variable_locs[[1]])==1){

@@ -31,16 +31,17 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   }
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
   if(ncol(independent_variables==2)){
+    print(independent_variables)
     vibrate=FALSE
     message('We dropped all the variables that you could possible vibrate over due to NAs or lacking multiple levels. Vibrate parameter being set to FALSE.')
   }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff)) %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
   out = out %>% dplyr::mutate(dataset_id=x[[3]])
-  return(list(out,vibrate))
+  return(list('output' = out,'vibrate' = vibrate))
 }
 
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff))
-    output[[1]] = dplyr::bind_rows(output[[1]])
+    output[['output']] = dplyr::bind_rows(output[['output']])
   return(output)
 }

@@ -9,7 +9,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     message(paste('Primary variable of interest: ',primary_variable,sep=''))
     message(paste('FDR method: ',fdr_method,sep=''))
     message(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
-    message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
+    message(paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
     message(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
@@ -40,7 +40,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     message(paste('FDR method: ',fdr_method,sep=''))
     message(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     message(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
-    message(paste('Max number of vibrations: ',as.character(max_vibration_num),sep=''))
+    message(paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
     message(paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 0.1% of all features being significant,',as.character(.001*max_models),'vibrations.'))

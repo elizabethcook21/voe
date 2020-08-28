@@ -43,6 +43,13 @@ message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')
 dependent_variables=list()
 
+for(value in dependent_variable_locs){
+  print('here')
+  print(value)
+}
+
+
+"""
 if(length(dependent_variable_locs[[1]])>1){
 	for(i in seq_along(dependent_variable_locs[[1]]))
     data = tibble::tibble(readRDS(trimws(dependent_variable_locs[[1]][[i]])))

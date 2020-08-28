@@ -34,6 +34,7 @@ if ( is.null(opt$meta_analysis ) ) { opt$meta_analysis = FALSE }
 
 # run pipeline
 library(devtools)
+library(tidyverse)
 devtools::install_local(opt$path_to_repository, force=TRUE)
 library(voe)
 devtools::load_all()

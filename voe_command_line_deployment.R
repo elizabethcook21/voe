@@ -28,7 +28,7 @@ if ( !is.null(opt$help) ) {
 if ( is.null(opt$fdr_method    ) ) { opt$fdr_method    = 'BY'     }
 if ( is.null(opt$fdr_cutoff      ) ) { opt$fdr_cutoff      = 0.05     }
 if ( is.null(opt$max_vibration_num   ) ) { opt$max_vibration_num   = 50000    }
-if ( is.null(opt$proportion_cutoff ) ) { opt$proportion_cutoff = 0.9 }
+if ( is.null(opt$proportion_cutoff ) ) { opt$proportion_cutoff = 0.95 }
 if ( is.null(opt$model_type ) ) { opt$model_type = 'gaussian' }
 if ( is.null(opt$meta_analysis ) ) { opt$meta_analysis = FALSE }
 

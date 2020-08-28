@@ -40,7 +40,9 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 }
 
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate){
-    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff))
+    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate))
     output[['output']] = dplyr::bind_rows(output[['output']])
+    print(output[['output']])
+    print(output[['vibrate']])
   return(output)
 }

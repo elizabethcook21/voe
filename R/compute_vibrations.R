@@ -22,7 +22,7 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
       dataset_id = dataset_id,
       vars = varset,
       full_fits = purrr::map(vars, function(y) tryCatch(broom::tidy(stats::glm(formula=as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),family=model_type,data = regression_df)),warning = function(w) w, error = function(e) e)),
-      feature_fit = purrr::map(vib_df$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,term)),warning = function(w) w,error = function(e) e)
+      feature_fit = purrr::map(full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,term)),warning = function(w) w,error = function(e) e)
       )
     ))
 }

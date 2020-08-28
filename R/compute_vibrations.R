@@ -38,7 +38,6 @@ compute_vibrations <- function(bound_data,primary_variable,model_type,features_o
   output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff))) 
   output = output %>% dplyr::filter(!is.na(independent_feature))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-sampleID,-primary_variable) %>% colnames))))
-  print(vibration_variables)
   return(list('vibration_output'=output,'vibration_variables'=vibration_variables))
 }
 

@@ -7,6 +7,7 @@ spec = matrix(c(
   'dependent_variables', 'd', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'independent_variables', 'i', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'primary_variable', 'v', 2, "character","Primary independent variable of interest.",
+  'vibrate', 'b', 1, "logical","TRUE/FALSE -- Run vibrations (default: TRUE)",
   'output_path', 'o', 2, "character","Output rds name",
   'fdr_method', 'm', 1, "character","Multiple hypothesis testing method (BY, BH, bonferroni, default = BY)",
   'fdr_cutoff', 'c', 1, "double","Float between 0.0 and 1.0, FDR-adjusted p-value threshold. (default = 0.05)",
@@ -26,6 +27,7 @@ if ( !is.null(opt$help) ) {
 
 ### set defaults if necessary
 if ( is.null(opt$fdr_method    ) ) { opt$fdr_method    = 'BY'     }
+if ( is.null(opt$vibrate    ) ) { opt$vibrate    = TRUE     }
 if ( is.null(opt$fdr_cutoff      ) ) { opt$fdr_cutoff      = 0.05     }
 if ( is.null(opt$max_vibration_num   ) ) { opt$max_vibration_num   = 50000    }
 if ( is.null(opt$proportion_cutoff ) ) { opt$proportion_cutoff = 0.95 }

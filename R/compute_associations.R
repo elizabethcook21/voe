@@ -12,7 +12,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
     ))
 }
 
-run_associations <- function(x,primary_variable,model_type,proportion_cutoff){
+run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate){
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
   toremove = which(colSums(dependent_variables %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
@@ -30,13 +30,17 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff){
     print(todrop)
   }
   independent_variables=independent_variables %>% dplyr::select(-all_of(todrop))
+  if(ncol(independent_variables==2)){
+    vibrate=FALSE
+    message('We dropped all the variables that you could possible vibrate over due to NAs or lacking multiple levels. Vibrate parameter being set to FALSE.')
+  }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff)) %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
   out = out %>% dplyr::mutate(dataset_id=x[[3]])
-  return(out)
+  return(list(out,vibrate))
 }
 
-compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff){
+compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff))
-    output = dplyr::bind_rows(output)
+    output[[1]] = dplyr::bind_rows(output[[1]])
   return(output)
 }

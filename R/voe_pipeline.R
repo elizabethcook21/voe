@@ -5,6 +5,7 @@
 #' @param dependent_variables A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
 #' @param independent_variables A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent_variables tibble.
 #' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param vibrate TRUE/FALSE -- run vibrations (default=TRUE)
 #' @param fdr_method Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
 #' @param fdr_cutoff Cutoff for an FDR significant association (default = 0.05).
 #' @param max_vibration_num Maximum number of vibrations (default=50000).
@@ -15,7 +16,7 @@
 #' @export
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
-full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian'){
+full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian'){
   logger <- initialize_logger()
 
   output_to_return = list()
@@ -34,8 +35,9 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   if(passed==TRUE){
     Sys.sleep(2)
     message('Deploying initial associations...')
-    association_output <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff)#,mtry,num.trees,importance,min.node.size,splitrule)
-    output_to_return[['initial_association_output']] = association_output
+    association_output <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
+    output_to_return[['initial_association_output']] = association_output[[1]]
+    vibrate=association_output[[2]]
     if(meta_analysis == TRUE){
       metaanalysis <- compute_metaanalysis(association_output)
       metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)
@@ -49,12 +51,13 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       message('No significant features found, consider adjusting parameters or data and trying again.')
       return(output_to_return)
     }
-    output_to_return[['features_to_vibrate_over']] = features_of_interest
-    vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
-    output_to_return[['vibration_variables']] = vibration_output[[2]]
-    print(vibration_output[[2]])
-    analyzed_voe_data = analyze_voe_data(vibration_output)
-    output_to_return[['analyzed_voe_data']] = analyzed_voe_data
+    if(vibrate==TRUE){
+      output_to_return[['features_to_vibrate_over']] = features_of_interest
+      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
+      output_to_return[['vibration_variables']] = vibration_output[[2]]
+      analyzed_voe_data = analyze_voe_data(vibration_output)
+      output_to_return[['analyzed_voe_data']] = analyzed_voe_data
+    }
     message('Done!')
     return(output_to_return)
   }

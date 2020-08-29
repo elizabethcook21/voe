@@ -1,5 +1,5 @@
 # Vibrates over a single maximal model for a single feature
-vibrate <- function(independent_variables, feature, dependent_variables,primary_variable,model_type,max_vibration_num,dataset_id,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule) {
+vibrate <- function(independent_variables, feature, dependent_variables,primary_variable,model_type,max_vibration_num,dataset_id,proportion_cutoff,logger){#,mtry,num.trees,importance,min.node.size,splitrule) {
   colnames(dependent_variables)[[1]]='sampleID'
   colnames(independent_variables)[[1]]='sampleID'
   tokeep = independent_variables %>% tidyr::drop_na() %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
@@ -23,19 +23,19 @@ vibrate <- function(independent_variables, feature, dependent_variables,primary_
     ))
 }
 
-dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule){
-  message(paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
+dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,logger){#,mtry,num.trees,importance,min.node.size,splitrule){
+  log4r::info(logger,paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
   dep_sub = subframe[[1]]
   in_sub = subframe[[2]]
   purrr::reduce( # map over all feature's want to vibrate for
-    purrr::map(features_of_interest, function(x) vibrate(in_sub, x, dep_sub,primary_variable,model_type,max_vibration_num, subframe[[3]], proportion_cutoff)),#,mtry,num.trees,importance,min.node.size,splitrule)),
+    purrr::map(features_of_interest, function(x) vibrate(in_sub, x, dep_sub,primary_variable,model_type,max_vibration_num, subframe[[3]], proportion_cutoff,logger)),#,mtry,num.trees,importance,min.node.size,splitrule)),
     rbind, #combine all features
     .init = NA_real_ # .init is supplied as the first value to start the accumulation in reduce, as o.w. reduce with throw error for empty starting value
   )
 }
 
-compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff){#,mtry,num.trees,importance,min.node.size,splitrule){
-  output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff))) 
+compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,logger){#,mtry,num.trees,importance,min.node.size,splitrule){
+  output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff,logger)))
   output = output %>% dplyr::filter(!is.na(independent_feature))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-sampleID,-primary_variable) %>% colnames))))
   return(list('vibration_output'=output,'vibration_variables'=vibration_variables))

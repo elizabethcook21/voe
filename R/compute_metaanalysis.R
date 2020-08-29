@@ -1,7 +1,7 @@
 
-compute_metaanalysis <- function(df) {
+compute_metaanalysis <- function(df,logger) {
   new_df <- tibble::tibble(analysis = "meta-analysis") # create new tibble with placeholder column
-  message('Computing meta-analysis')
+  log4r::info(logger,'Computing meta-analysis')
   features=unique(df$feature)
   for (i in seq_along(features)) {
     new_colname = features[[i]]
@@ -41,10 +41,10 @@ get_converged_metadfs <- function(meta_df) {
   return(meta_df)
 }
 
-get_summary_stats <- function(input_meta_df) {
+get_summary_stats <- function(input_meta_df,logger) {
   meta_df=get_converged_metadfs(input_meta_df)
   if(ncol(input_meta_df)!=ncol(meta_df)){
-    message(paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe.'))
+    log4r::info(logger,paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe.'))
   }
   return(
     tibble::tibble(
@@ -60,8 +60,8 @@ get_summary_stats <- function(input_meta_df) {
   )
 }
 
-clean_metaanalysis <- function(metaanalysis) {
+clean_metaanalysis <- function(metaanalysis,logger) {
   meta_outputs <- tibble::as_tibble(metaanalysis)
-  output <- get_summary_stats(meta_outputs)
+  output <- get_summary_stats(meta_outputs,logger)
   return(output)
 }

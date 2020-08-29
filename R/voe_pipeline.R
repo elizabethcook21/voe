@@ -30,17 +30,17 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     bound_data = dplyr::tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
-  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis,model_type)#, mtry, num.trees, importance,min.node.size,splitrule)
+  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis,model_type, logger)#, mtry, num.trees, importance,min.node.size,splitrule)
   if(passed==TRUE){
     Sys.sleep(2)
     log4r::info(logger,'Deploying initial associations...')
-    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate)
+    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, logger)
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
     association_output=association_output_full[['output']]
     if(meta_analysis == TRUE){
-      metaanalysis <- compute_metaanalysis(association_output)
-      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis)
+      metaanalysis <- compute_metaanalysis(association_output,logger)
+      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis,logger)
       output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
       features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
     }
@@ -53,9 +53,9 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     }
     if(vibrate==TRUE){
       output_to_return[['features_to_vibrate_over']] = features_of_interest
-      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff)#, mtry, num.trees, importance, min.node.size, splitrule)
+      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,logger)#, mtry, num.trees, importance, min.node.size, splitrule)
       output_to_return[['vibration_variables']] = vibration_output[[2]]
-      analyzed_voe_data = analyze_voe_data(vibration_output)
+      analyzed_voe_data = analyze_voe_data(vibration_output,logger)
       output_to_return[['analyzed_voe_data']] = analyzed_voe_data
     }
     log4r::info(logger,'Done!')

@@ -1,0 +1,1 @@
+INFO  [2020-08-28 22:27:59] You should have gotten a summary of all the columns in your table, for example their means and number of variables.

@@ -7,7 +7,7 @@
 #' @examples
 #' ind_var_analysis(metadata)
 ind_var_analysis <- function(independent_variables){
-  my_logger <- initialize_logger()
+  my_logger <- initialize_logger(paste0('ind_var_analysis_',format(Sys.time(), "%d-%b-%Y_%H.%M")))
   ind_var <- dplyr::as_tibble(independent_variables)
   columnSummaries <- summary(ind_var)
   # This should probably be changed in the future to a more human readable file type like txt, html, pdf, or excel

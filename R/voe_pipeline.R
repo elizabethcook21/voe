@@ -17,7 +17,7 @@
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
 full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian'){
-  logger <- initialize_logger()
+  logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")))
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
     log4r::info(logger,'Identified multiple input datasets, preparing to run meta-analysis.')

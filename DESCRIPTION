@@ -31,7 +31,8 @@ Imports:
     ggplot2,
     broom,
     cowplot,
-    rje
+    rje,
+    ggplot2
 RoxygenNote: 7.1.1
 Suggests: 
     testthat

@@ -78,7 +78,9 @@ message('Data parsed and loaded, running pipeline.')
 
 output = voe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis, model_type=opt$model_type)
 
-saveRDS(output,opt$output_path)
+if(exists("output")==TRUE){
+  saveRDS(output,opt$output_path)
+}
 
 # q(status=0)
 

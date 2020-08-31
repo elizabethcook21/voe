@@ -15,8 +15,8 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
     num_ind = purrr::map(independent_variables, function(x) ncol(x)-1)
     data_summary = dplyr::bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset_number=seq_along(num_features))    %>% dplyr::mutate(max_models_per_feature = `Number of adjusters`*max_vibration_num)
-    log4r::info(logger,'Preparing to run pipeline with the following parameters:')
-    log4r::info(logger,(data_summary))
+    message('Preparing to run pipeline with the following parameters:')
+    print((data_summary))
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
     log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features and, assuming 0.1% of all features being significant,',as.character(.001*max_models),'vibrations.'))
@@ -43,7 +43,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
-    log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 0.1% of all features being significant,',as.character(.001*max_models),'vibrations.'))
+    log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 0.1% of all features being significant,',as.character(floor(.001*max_models)),'vibrations.'))
     if(max_models>10000000){
       log4r::info(logger,'Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
       Sys.sleep(2)

@@ -2,6 +2,7 @@
 
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff, logger){
   feature_name = colnames(dependent_variables)[j+1]
+  print(feature_name)
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),feature_name),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) %>% tidyr::drop_na()
   regression_df = regression_df %>% dplyr::select(-sampleID)
   #run regression

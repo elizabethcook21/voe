@@ -48,6 +48,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, logger){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, logger))
+print(output)
     output_regs = purrr::map(output, function(x) x[[1]])
     output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))
     if(FALSE %in% output_vib & vibrate!=FALSE){

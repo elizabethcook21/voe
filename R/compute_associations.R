@@ -16,10 +16,10 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
   toremove = which(colSums(dependent_variables %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
-  log4r::info(logger,paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
+  log4r::info(logger,paste("Removing",length(toremove),"features that are over",proportion_cutoff*100,"percent zero values."))
   dependent_variables=dependent_variables %>% dplyr::select(-(toremove+1))
   if(ncol(dependent_variables)==1){
-    log4r::info(logger,'After filtering for data that was mostly zero values, you had nothing left. Try lowering your filtering threshold and running again.')
+    log4r::info(logger,'After filtering your data, you had nothing left. Try changing your filtering threshold for zero-value data and running again.')
     return('')
   }
   independent_variables <- dplyr::as_tibble(x[[2]])

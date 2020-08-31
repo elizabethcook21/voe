@@ -2,12 +2,12 @@
 ###mixed effects model to look at confounder analysis
 
 filter_unnest_feature_vib <- function(vib_df,logger) {
-  saveRDS(vib_df,'temp.rds')
   return(vib_df %>% dplyr::slice(which(purrr::map_lgl(vib_df$feature_fit, ~class(.)[[1]] == "tbl_df"))) %>% tidyr::unnest(feature_fit))
 }
 
 get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
   browser()
+  saveRDS(voe_df,'temp.rds')
   copy_voe_df <- rlang::duplicate(voe_df, shallow = FALSE)
   for (variable in adjusters) {
     copy_voe_df  = copy_voe_df %>% dplyr::mutate(newcol = purrr::map_int(copy_voe_df$vars, ~(variable %in% .)))

@@ -2,11 +2,10 @@
 
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff, logger){
   feature_name = colnames(dependent_variables)[j+1]
-  print(feature_name)
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),feature_name),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) %>% tidyr::drop_na()
   regression_df = regression_df %>% dplyr::select(-sampleID)
   #run regression
-  print(regression_df)
+  print(broom::tidy(stats::glm(formula=as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,data = regression_df)) %>% dplyr::mutate(feature=feature_name))
     return(tryCatch(broom::tidy(stats::glm(formula=as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,data = regression_df)) %>% dplyr::mutate(feature=feature_name),
              # NOTE: tidy() ends up removing and singularity fits (e.g. NA fits from a feature that, for the dataset's samples all have 0 relative abundance) #####NEED TO LOG THIS SOMEHOW
              warning = function(w) w, # if warning or error, just return them instead of output

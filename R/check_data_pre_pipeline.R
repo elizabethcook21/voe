@@ -16,7 +16,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_ind = purrr::map(independent_variables, function(x) ncol(x)-1)
     data_summary = dplyr::bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset_number=seq_along(num_features))    %>% dplyr::mutate(max_models_per_feature = `Number of adjusters`*max_vibration_num)
     log4r::info(logger,'Preparing to run pipeline with the following parameters:')
-    print(data_summary)
+    log4r::info((data_summary))
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
     log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features and, assuming 0.1% of all features being significant,',as.character(.001*max_models),'vibrations.'))

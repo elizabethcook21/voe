@@ -23,7 +23,6 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
     quit()
   }
   independent_variables <- dplyr::as_tibble(x[[2]])
-  print(independent_variables)
   colnames(independent_variables)[[1]]='sampleID'
   log4r::info(logger,paste('Computing',as.character(ncol(dependent_variables)-1),'associations for dataset',as.character(unname(unlist(x[[3]])))))
   colnames(dependent_variables)[1]='sampleID'
@@ -32,7 +31,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
     log4r::info(logger,'Dropping the following variables due to either lacking multiple levels or containing NaN values:')
-    print(todrop)
+    log4r::info(logger,todrop)
     if(primary_variable %in% todrop){
       print('One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
       quit()
@@ -42,8 +41,6 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   if(ncol(independent_variables)==2){
     vibrate=FALSE
   }
-    print(independent_variables)
-
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,logger))
   out = out %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
   out = out %>% dplyr::mutate(dataset_id=x[[3]])

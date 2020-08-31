@@ -8,6 +8,7 @@ filter_unnest_feature_vib <- function(vib_df,logger) {
 get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
   browser()
   saveRDS(voe_df,'temp.rds')
+  saveRDS(adjusters,'adjusters.rds')
   copy_voe_df <- rlang::duplicate(voe_df, shallow = FALSE)
   for (variable in adjusters) {
     copy_voe_df  = copy_voe_df %>% dplyr::mutate(newcol = purrr::map_int(copy_voe_df$vars, ~(variable %in% .)))

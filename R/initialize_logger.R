@@ -1,7 +1,11 @@
-initialize_logger <- function(fileName, saveLog){
+initialize_logger <- function(fileName, saveLog, logFilePath){
 
   if(saveLog == TRUE){
-    my_logfile = paste0('logfile_',fileName, '.txt')
+    if(is.null(logFilePath)){
+      my_logfile = paste0('logfile_',fileName, '.txt')
+    }else{
+      my_logfile = paste0(logFilePath,'_logfile_',fileName, '.txt')
+    }
     
     my_console_appender = log4r::console_appender()
     my_file_appender = log4r::file_appender(my_logfile, append = TRUE)

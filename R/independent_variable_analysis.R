@@ -7,8 +7,8 @@
 #' @export
 #' @examples
 #' ind_var_analysis(metadata)
-ind_var_analysis <- function(independent_variables, output_location = getwd()){
-  my_logger <- initialize_logger(paste0('ind_var_analysis_',format(Sys.time(), "%d-%b-%Y_%H.%M")))
+ind_var_analysis <- function(independent_variables, output_location = getwd(),log=TRUE,log_file_path=NULL){
+  my_logger <- initialize_logger(paste0('ind_var_analysis_',format(Sys.time(), "%d-%b-%Y_%H.%M")),log,log_file_path)
 
   # Create a folder to store all the outputs
   pathToNewFolder <- paste0(output_location, '/Metadata_Files')

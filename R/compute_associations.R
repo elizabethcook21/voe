@@ -20,7 +20,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   dependent_variables=dependent_variables %>% dplyr::select(-(toremove+1))
   if(ncol(dependent_variables)==1){
     log4r::info(logger,'After filtering your data, you had nothing left. Try changing your filtering threshold for zero-value data and running again.')
-    return('')
+    quit()
   }
   independent_variables <- dplyr::as_tibble(x[[2]])
   colnames(independent_variables)[[1]]='sampleID'

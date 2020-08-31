@@ -19,7 +19,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     print((data_summary))
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
-    log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features and, assuming 0.1% of all features being significant,',as.character(.001*max_models),'vibrations.'))
+    log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features and, assuming 0.1% of all features being significant,',as.character(floor(.001*max_models)),'vibrations.'))
     if(max_models>10000000){
       log4r::info(logger,'Warning: a run at this scale (over 10 million models fit) may take a long time.')
       Sys.sleep(2)

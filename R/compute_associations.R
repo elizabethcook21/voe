@@ -19,7 +19,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   log4r::info(logger,paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
   dependent_variables=dependent_variables %>% dplyr::select(-(toremove+1))
   if(ncol(dependent_variables)==1){
-    log4r::info(logger,'After filtering for data that was mostly zero values, you had nothing left. Try lowering your filtering threshold and running again.'))
+    log4r::info(logger,'After filtering for data that was mostly zero values, you had nothing left. Try lowering your filtering threshold and running again.')
     return('')
   }
   independent_variables <- dplyr::as_tibble(x[[2]])

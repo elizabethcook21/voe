@@ -27,7 +27,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   log4r::info(logger,paste('Computing',as.character(ncol(dependent_variables)-1),'associations for dataset',as.character(unname(unlist(x[[3]])))))
   colnames(dependent_variables)[1]='sampleID'
   colnames(independent_variables)[1]='sampleID'
-  tokeep = independent_variables %>% tidyr::drop_na() %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
+  tokeep = independent_variables %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
     log4r::info(logger,'Dropping the following variables due to either lacking multiple levels or containing NaN values:')

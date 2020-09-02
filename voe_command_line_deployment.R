@@ -37,9 +37,7 @@ if ( is.null(opt$meta_analysis ) ) { opt$meta_analysis = FALSE }
 # run pipeline
 suppressMessages(library(devtools))
 suppressMessages(library(tidyverse))
-suppressMessages(devtools::install_local(opt$path_to_repository, force=TRUE))
 suppressMessages(library(voe))
-suppressMessages(devtools::load_all())
 
 message('Parsing input data...')
 dependent_variable_locs = strsplit(as.character(opt$dependent_variables),',')

@@ -12,11 +12,12 @@
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param meta_analysis TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+#' @param cores Number of cores to use for vibration (default = 1).
 #' @keywords pipeline
 #' @export
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
-full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian',log=FALSE, log_file_path=NULL){
+full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian',log=FALSE, cores = 1, log_file_path=NULL){
   logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), log, log_file_path)
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
@@ -53,7 +54,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     }
     if(vibrate==TRUE){
       output_to_return[['features_to_vibrate_over']] = features_of_interest
-      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,logger)#, mtry, num.trees, importance, min.node.size, splitrule)
+      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,cores,logger)#, mtry, num.trees, importance, min.node.size, splitrule)
       output_to_return[['vibration_variables']] = vibration_output[[2]]
       analyzed_voe_data = analyze_voe_data(vibration_output,logger)
       output_to_return[['analyzed_voe_data']] = analyzed_voe_data

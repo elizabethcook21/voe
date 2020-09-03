@@ -14,6 +14,7 @@ spec = matrix(c(
   'max_vibration_num', 'n', 1, "integer","Integer, max number of vibrations per feature. (default = 50000)",
   'proportion_cutoff', 'p', 1, "double","Float between 0.0 and 1.0. (default = 0.9",
   'meta_analysis', 'a', 1, "logical","TRUE/FALSE (default: FALSE)",
+  'cores', 't', 1, "integer","Number of cores to use (default = 1).",
   'model_type', 'f', 1, "character","GLM family. (default: gaussian)",
   'help'   , 'h', 0, "display command line options","logical"
 ), byrow=TRUE, ncol=5)
@@ -27,6 +28,7 @@ if ( !is.null(opt$help) ) {
 
 ### set defaults if necessary
 if ( is.null(opt$fdr_method    ) ) { opt$fdr_method    = 'BY'     }
+if ( is.null(opt$cores    ) ) { opt$cores    = 1     }
 if ( is.null(opt$vibrate    ) ) { opt$vibrate    = TRUE     }
 if ( is.null(opt$fdr_cutoff      ) ) { opt$fdr_cutoff      = 0.05     }
 if ( is.null(opt$max_vibration_num   ) ) { opt$max_vibration_num   = 50000    }
@@ -74,7 +76,7 @@ if(length(unlist(independent_variable_locs))==1){
 
 message('Data parsed and loaded, running pipeline.')
 
-output = voe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis, model_type=opt$model_type)
+output = voe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis, model_type=opt$model_type,cores=opt$cores)
 
 if(exists("output")==TRUE){
   saveRDS(output,opt$output_path)

@@ -42,10 +42,19 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
     vibrate=FALSE
   }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,logger))
-  print(out)
-  out = out %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
-  out = out %>% dplyr::mutate(dataset_id=x[[3]])
-  return(list('output' = out,'vibrate' = vibrate))
+  out_success = out[unlist(purrr::map(out,function(x) tibble::is_tibble(x)))]
+  if(length(out_success)!=length(out)){
+    log4r::info(logger,paste('Dropping',length(out)-length(out_success),'features with regressions that failed to converge.'))
+  }
+  if(length(out_success)==0){
+    log4r::info(logger,paste("All of your regression output failed. Printing error messages to screen."))
+    Sys.sleep(3)
+    print(out)
+    quit()
+  }
+  out_success = out_success %>% dplyr::bind_rows() %>% dplyr::filter(term!='(Intercept)') %>% dplyr::mutate( bonferroni = p.adjust(p.value, method = "bonferroni"), BH = p.adjust(p.value, method = "BH"), BY = p.adjust(p.value, method = "BY"))
+  out_success = out_success %>% dplyr::mutate(dataset_id=x[[3]])
+  return(list('output' = out_success,'vibrate' = vibrate))
 }
 
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, logger){

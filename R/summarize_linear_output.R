@@ -7,7 +7,7 @@ filter_unnest_feature_vib <- function(vib_df,logger) {
 
 get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
   copy_voe_df <- rlang::duplicate(voe_df, shallow = FALSE)
-  adjusters= unique(unlist(unname(map(adjusters, function(x) unlist(x)))))
+  adjusters= unique(unlist(unname(purrr::map(adjusters, function(x) unlist(x)))))
   for (variable in adjusters) {
     copy_voe_df  = copy_voe_df %>% dplyr::mutate(newcol = purrr::map_int(copy_voe_df$vars, ~(variable %in% .)))
     colnames(copy_voe_df)[length(colnames(copy_voe_df))] <- variable
@@ -20,13 +20,26 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
   voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(full_fits,std.error,statistic))
   voe_adjust_for_reg_ptype$estimate=abs(voe_adjust_for_reg_ptype$estimate)
   if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype) & !(1 %in% unique(unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature)))))){
-    fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . +(1|independent_feature) -independent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
-    fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
+    tryCatch({
+      fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . +(1|independent_feature) -independent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
+      fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
+      },
+    error = function(e){
+      fit_estimate_forplot = 'Confounder analysis failed.'
+      print(fit_estimate_forplot)
+      log4r::info(logger,'Note: Mixed effect modeling to identify sources of confounding failed. Running a simple linear model instead. If you want to try this analysis yourself, you can access the raw data for this yourself in the output and follow the methodological layout in the docs.')
+    })
   }
   else{
-    log4r::info(logger,'Note: Some features only had 1 vibration associated with them, likely due to a model failure or a paucity of vibration features. This means your confounder analysis will be done will a regular linear model, instead of a mixed effect one. See the documentation for more details.')
-    fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . - estimate - p.value))
-    fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
+    tryCatch({
+      log4r::info(logger,'Note: Some features only had 1 vibration associated with them, likely due to a model failure or a paucity of vibration features. This means your confounder analysis will be done will a regular linear model, instead of a mixed effect one. See the documentation for more details.')
+      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,as.formula(estimate ~ . - estimate - p.value))
+      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(estimate-std.error),sdmax=(estimate+std.error))
+    },
+    error = function(e){
+      fit_estimate_forplot = 'Confounder analysis failed.'
+      log4r::info(logger,'Confounder analysis failed despite multiple attempts. We recommend looking at the raw vibration output to see what the issue may be.')
+    })
   }
   return(fit_estimate_forplot)
 }
@@ -44,11 +57,19 @@ summarize_vibration_data_by_feature <- function(df,logger){
   return(summarized_voe_data)
 }
 
-analyze_voe_data <- function(vibration_output,logger){
+analyze_voe_data <- function(vibration_output,confounder_analysis,logger){
   voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]],logger)
   voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated,logger) %>% dplyr::select(-vars)
   summarized = summarize_vibration_data_by_feature(voe_unnested_annotated,logger)
-  confounder_analysis = find_confounders_linear(voe_unnested_annotated,logger)
-  return(list('summarized_vibration_output'= summarized,'confounder_analysis'=confounder_analysis,'data'=voe_unnested_annotated))
+  c_analysis='No confounder analysis completed.'
+  if(confounder_analysis==TRUE){
+    if(nrow(voe_unnested_annotated)>=10){
+      c_analysis = find_confounders_linear(voe_unnested_annotated,logger)
+    }
+    else{
+      log4r::info(logger,'Skipping confounder analysis, as not enough vibrations (under 10) completed to make it worthwhile.') 
+    }
+  } 
+  return(list('summarized_vibration_output'= summarized,'confounder_analysis'=c_analysis,'data'=voe_unnested_annotated))
 }
 

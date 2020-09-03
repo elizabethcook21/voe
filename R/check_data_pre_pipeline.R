@@ -1,6 +1,6 @@
 #pre-flight checks
 
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,proportion_cutoff,meta_analysis,model_type, logger){
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger){
   log4r::info(logger,'Checking input data...')
   if(meta_analysis==TRUE){
 #    if(model_type=='rf'){
@@ -10,6 +10,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     log4r::info(logger,paste('FDR method: ',fdr_method,sep=''))
     log4r::info(logger,paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
     log4r::info(logger,paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
@@ -41,6 +42,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     log4r::info(logger,paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     log4r::info(logger,paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
     log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features, with',max_models_per_feature,'per feature. Assuming 0.1% of all features being significant,',as.character(floor(.001*max_models)),'vibrations.'))

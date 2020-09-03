@@ -30,7 +30,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   tokeep = independent_variables %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
-    log4r::info(logger,'Dropping the following variables due to either lacking multiple levels or containing NaN values:')
+    log4r::info(logger,'Dropping the following variables due to lacking multiple levels:')
     log4r::info(logger,todrop)
     if(primary_variable %in% todrop){
       print('One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
@@ -53,7 +53,7 @@ compute_initial_associations <- function(bound_data,primary_variable, model_type
     output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))
     if(FALSE %in% output_vib & vibrate!=FALSE){
       output_vib=FALSE
-      log4r::info(logger,'For at least one dataset, we dropped all the variables that you could possible vibrate over due to NAs or lacking multiple levels. Vibrate parameter being set to FALSE.')
+      log4r::info(logger,'For at least one dataset, we dropped all the variables that you could possible vibrate over due to lacking multiple levels. Vibrate parameter being set to FALSE.')
     }
     output_regs = dplyr::bind_rows(output_regs)
   return(list('output'=output_regs,'vibrate'=output_vib))

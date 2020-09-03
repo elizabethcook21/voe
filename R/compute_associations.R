@@ -29,7 +29,6 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   colnames(independent_variables)[1]='sampleID'
   tokeep = independent_variables %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(independent_variables),tokeep)
-  head(independent_variables)
   if(length(todrop)>1){
     log4r::info(logger,'Dropping the following variables due to lacking multiple levels:')
     log4r::info(logger,todrop)

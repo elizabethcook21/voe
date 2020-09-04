@@ -2,25 +2,35 @@
 % Please edit documentation in R/voe_pipeline.R
 \name{full_voe_pipeline}
 \alias{full_voe_pipeline}
-\title{The VOE Pipeline}
+\title{Full VoE Pipeline}
 \usage{
 full_voe_pipeline(
   dependent_variables,
   independent_variables,
   primary_variable,
+  vibrate = TRUE,
   fdr_method = "BY",
   fdr_cutoff = 0.05,
   max_vibration_num = 50000,
-  proportion_cutoff = 0.1,
-  meta_analysis = FALSE
+  regression_weights = NULL,
+  max_vars_in_model = NULL,
+  proportion_cutoff = 0.95,
+  meta_analysis = FALSE,
+  model_type = "gaussian",
+  log = FALSE,
+  cores = 1,
+  confounder_analysis = TRUE,
+  log_file_path = NULL
 )
 }
 \arguments{
 \item{dependent_variables}{A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).}
 
-\item{independent_variables}{A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.}
+\item{independent_variables}{A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent_variables tibble.}
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
+
+\item{vibrate}{TRUE/FALSE -- run vibrations (default=TRUE)}
 
 \item{fdr_method}{Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.}
 
@@ -28,12 +38,28 @@ full_voe_pipeline(
 
 \item{max_vibration_num}{Maximum number of vibrations (default=50000).}
 
+\item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
+
+\item{max_vars_in_model}{Maximum number of variables allowed in a single fit (for vibrations). (default=NULL)}
+
+\item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)}
+
 \item{meta_analysis}{TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.}
+
+\item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
+
+\item{log}{TRUE/FALSE. Save output to log file.}
+
+\item{cores}{Number of cores to use for vibration (default = 1).}
+
+\item{confounder_analysis}{Run mixed effect confounder analysis (default=TRUE).}
+
+\item{log_file_path}{Location where you would like logfile to be saved if log==TRUE (default=NULL).}
 }
 \description{
 This function will run the full pipeline
 }
 \examples{
-voepipeline(metadata, abundance_data, mapping)
+voepipeline(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL)
 }
 \keyword{pipeline}

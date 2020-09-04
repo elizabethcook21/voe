@@ -21,6 +21,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
     ))
 }
 
+
 dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){#,mtry,num.trees,importance,min.node.size,splitrule){
   log4r::info(logger,paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
   dep_sub = subframe[[1]]
@@ -48,6 +49,7 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
   }
 }
 
+#' @export
 compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){#,mtry,num.trees,importance,min.node.size,splitrule){
   output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)))
   output = output %>% dplyr::filter(!is.na(independent_feature))

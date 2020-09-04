@@ -1,4 +1,13 @@
 
+#' Run meta-analysis
+#'
+#' Run meta-analysis for each feature
+#' @param df Association output.
+#' @param logger Logger object (default = NULL).
+#' @keywords meta-analysis
+#' @export
+#' @examples
+#' compute_metaanalysis(df,logger)
 compute_metaanalysis <- function(df,logger) {
   new_df <- tibble::tibble(analysis = "meta-analysis") # create new tibble with placeholder column
   log4r::info(logger,'Computing meta-analysis')
@@ -26,6 +35,14 @@ compute_metaanalysis <- function(df,logger) {
   return(new_df %>% dplyr::select(-analysis)) # remove placeholder column
 }
 
+#' Filter-meta analysis
+#'
+#' Remove failed meta-analyses.
+#' @param meta_df Meta-analysis output.
+#' @keywords meta-analysis
+#' @export
+#' @examples
+#' get_converged_metadfs(df,logger)
 get_converged_metadfs <- function(meta_df) {
   toremove=list()
   count=0
@@ -41,6 +58,15 @@ get_converged_metadfs <- function(meta_df) {
   return(meta_df)
 }
 
+#' Extract meta-analysis summary statistics
+#'
+#' Remove failed meta-analyses.
+#' @param input_meta_df Meta-analysis output.
+#' @param logger Logger object (default = NULL).
+#' @keywords meta-analysis
+#' @export
+#' @examples
+#' get_summary_stats(input_meta_df,logger)
 get_summary_stats <- function(input_meta_df,logger) {
   meta_df=get_converged_metadfs(input_meta_df)
   if(ncol(input_meta_df)!=ncol(meta_df)){
@@ -60,6 +86,15 @@ get_summary_stats <- function(input_meta_df,logger) {
   )
 }
 
+#' Clean meta-analysis output and get summary statistics.
+#'
+#' Export meta-analysis.
+#' @param metaanalysis Meta-analysis output.
+#' @param logger Logger object (default = NULL).
+#' @keywords meta-analysis
+#' @export
+#' @examples
+#' clean_metaanalysis(input_meta_df,logger)
 clean_metaanalysis <- function(metaanalysis,logger) {
   meta_outputs <- tibble::as_tibble(metaanalysis)
   output <- get_summary_stats(meta_outputs,logger)

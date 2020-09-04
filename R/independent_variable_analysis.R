@@ -1,4 +1,4 @@
-#' Analysis of Indepdent Variables
+#' Analysis of Independent Variables
 #'
 #' This function will run the full pipeline
 #' #' @param independent_variables A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.

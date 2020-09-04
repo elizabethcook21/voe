@@ -5,6 +5,7 @@
 #' @param dependent_variables A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
 #' @param independent_variables A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent_variables tibble.
 #' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param vibrate TRUE/FALSE -- run vibrations (default=TRUE)
 #' @param max_vars_in_model Maximum number of variables allowed in a single fit (for vibrations). (default=NULL)
 #' @param fdr_method Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
@@ -21,7 +22,7 @@
 #' @export
 #' @examples
 #' voepipeline(metadata, abundance_data, mapping)
-full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL){
+full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL){
   logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), log, log_file_path)
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
@@ -39,7 +40,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   if(passed==TRUE){
     Sys.sleep(2)
     log4r::info(logger,'Deploying initial associations...')
-    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, logger)
+    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger)
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
     association_output=association_output_full[['output']]
@@ -58,11 +59,15 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     }
     if(vibrate==TRUE){
       output_to_return[['features_to_vibrate_over']] = features_of_interest
-      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,cores,logger,max_vars_in_model)#, mtry, num.trees, importance, min.node.size, splitrule)
-      saveRDS(vibration_output,'vibration_output.rds')
+      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)#, mtry, num.trees, importance, min.node.size, splitrule)
       output_to_return[['vibration_variables']] = vibration_output[[2]]
-      analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis,logger)
-      output_to_return[['analyzed_voe_data']] = analyzed_voe_data
+      if(confounder_analysis==TRUE){
+        analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis,logger)
+        output_to_return[['vibration_output']] = analyzed_voe_data
+      }
+      else{
+        output_to_return[['vibration_output']] = vibration_output[[1]]
+      }
     }
     log4r::info(logger,'Done!')
     return(output_to_return)

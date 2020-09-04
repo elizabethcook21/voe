@@ -1,18 +1,18 @@
 # For a single feature and single modeldf outputted by prune_metadata.R, computes the proportion of non-zero values per cohort.
 
-regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff, logger){
+regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
   feature_name = colnames(dependent_variables)[j+1]
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),c(feature_name)),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
   regression_df = regression_df %>% dplyr::select(-sampleID)
   #run regression
-    return(tryCatch(broom::tidy(stats::glm(formula=as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,data = regression_df)) %>% dplyr::mutate(feature=feature_name),
+    return(tryCatch(broom::tidy(stats::glm(formula=as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,weights=regression_df %>% dplyr::select(regression_weights) %>% unlist %>% unname,data = regression_df)) %>% dplyr::mutate(feature=feature_name),
              # NOTE: tidy() ends up removing and singularity fits (e.g. NA fits from a feature that, for the dataset's samples all have 0 relative abundance) #####NEED TO LOG THIS SOMEHOW
              warning = function(w) w, # if warning or error, just return them instead of output
              error = function(e) e
     ))
 }
 
-run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, logger){
+run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger){
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
   toremove = which(colSums(dependent_variables %>% dplyr::select(-sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
@@ -41,7 +41,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   if(ncol(independent_variables)==2){
     vibrate=FALSE
   }
-  out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,logger))
+  out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger))
   out_success = out[unlist(purrr::map(out,function(x) tibble::is_tibble(x)))]
   if(length(out_success)!=length(out)){
     log4r::info(logger,paste('Dropping',length(out)-length(out_success),'features with regressions that failed to converge.'))
@@ -57,8 +57,8 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   return(list('output' = out_success,'vibrate' = vibrate))
 }
 
-compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, logger){
-    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, logger))
+compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger){
+    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights, logger))
     output_regs = purrr::map(output, function(x) x[[1]])
     output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))
     if(FALSE %in% output_vib & vibrate!=FALSE){

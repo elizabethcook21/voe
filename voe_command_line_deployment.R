@@ -7,8 +7,9 @@ spec = matrix(c(
   'dependent_variables', 'd', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'independent_variables', 'i', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'primary_variable', 'v', 2, "character","Primary independent variable of interest.",
-  'vibrate', 'b', 1, "logical","TRUE/FALSE -- Run vibrations (default: TRUE)",
   'output_path', 'o', 2, "character","Output rds name",
+  'vibrate', 'b', 1, "logical","TRUE/FALSE -- Run vibrations (default: TRUE)",
+  'regression_weights', 'w', 1, "character","Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).",
   'fdr_method', 'm', 1, "character","Multiple hypothesis testing method (BY, BH, bonferroni, default = BY)",
   'fdr_cutoff', 'c', 1, "double","Float between 0.0 and 1.0, FDR-adjusted p-value threshold. (default = 0.05)",
   'max_vibration_num', 'n', 1, "integer","Integer, max number of vibrations per feature. (default = 50000)",
@@ -30,6 +31,7 @@ if ( !is.null(opt$help) ) {
 max_vibration_num = opt$max_vibration_num
 ### set defaults if necessary
 if ( is.null(opt$fdr_method    ) ) { opt$fdr_method    = 'BY'     }
+if ( is.null(opt$regression_weights    ) ) { opt$regression_weights    = NULL     }
 if ( is.null(opt$max_vars_in_model    ) ) { opt$max_vars_in_model    = NULL     }
 if ( is.null(opt$confounder_analysis    ) ) { opt$confounder_analysis    = TRUE     }
 if ( is.null(opt$cores    ) ) { opt$cores    = 1     }
@@ -80,7 +82,7 @@ if(length(unlist(independent_variable_locs))==1){
 
 message('Data parsed and loaded, running pipeline.')
 
-output = voe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,confounder_analysis=opt$confounder_analysis,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis,max_vars_in_model = opt$max_vars_in_model, model_type=opt$model_type,cores=opt$cores)
+output = voe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,confounder_analysis=opt$confounder_analysis,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis,regression_weights=opt$regression_weights, max_vars_in_model = opt$max_vars_in_model, model_type=opt$model_type,cores=opt$cores)
 
 if(exists("output")==TRUE){
   message('Writing output to file...')

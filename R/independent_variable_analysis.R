@@ -38,7 +38,16 @@ ind_var_analysis <- function(independent_variables, output_location = getwd(),lo
 
 }
 
-
+#' Making a Bar Graph
+#'
+#' This function will create a Bar Graph for discrete data 
+#' #' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' #' @param columnName The name of the column of which data will correspond to the x axis (the different bars of the graph)
+#' #' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+#' @keywords bar graph
+#' @export
+#' @examples
+#' makeBarGraph(ind_var, names(colTypes[i]),pathToNewFolder))
 makeBarGraph <- function(table, columnName,pathToNewFolder){
   ggplot2::ggplot(table, ggplot2::aes_string(x=columnName, fill = columnName)) +
     ggplot2::geom_bar() +
@@ -49,6 +58,16 @@ makeBarGraph <- function(table, columnName,pathToNewFolder){
 
 }
 
+#' Making a Histogram
+#'
+#' This function will create a Bar Graph for discrete data 
+#' #' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' #' @param columnName The name of the column of which data will correspond to the x axis 
+#' #' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+#' @keywords histogram
+#' @export
+#' @examples
+#' makeHistogram(histogram_tibble, names(colTypes[i]),pathToNewFolder)
 makeHistogram <- function(table, columnName,pathToNewFolder){
   ggplot2::ggplot(table, ggplot2::aes_string(x=columnName)) +
     ggplot2::geom_histogram() +

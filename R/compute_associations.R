@@ -2,7 +2,7 @@
 
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff, logger){
   feature_name = colnames(dependent_variables)[j+1]
-  regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),feature_name),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) %>% tidyr::drop_na()
+  regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),c(feature_name)),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
   regression_df = regression_df %>% dplyr::select(-sampleID)
   #run regression
     return(tryCatch(broom::tidy(stats::glm(formula=as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,data = regression_df)) %>% dplyr::mutate(feature=feature_name),

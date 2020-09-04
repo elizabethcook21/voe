@@ -13,6 +13,8 @@ Imports:
     tidyverse,
     readxl,
     dplyr,
+    furrr,
+    future,
     log4r,
     lme4,
     broom.mixed,

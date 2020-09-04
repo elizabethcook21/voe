@@ -27,14 +27,14 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
   in_sub = subframe[[2]]
   colnames(dep_sub)[[1]]='sampleID'
   colnames(in_sub)[[1]]='sampleID'
-  tokeep = in_sub %>% tidyr::drop_na() %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
+  tokeep = in_sub %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(in_sub),tokeep)
   if(length(todrop)>1){
     in_sub=in_sub %>% dplyr::select(-all_of(todrop))
   }
   dep_sub = dep_sub %>% select(sampleID,c(features_of_interest))
   variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(sampleID,all_of(primary_variable))))
-  merged_data=dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub,by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) %>% tidyr::drop_na() ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
+  merged_data=dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub %>% dplyr::mutate_if(is.factor, as.character),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
   if(as.integer(cores)>1){
     library(future)
     options(future.globals.maxSize = +Inf)

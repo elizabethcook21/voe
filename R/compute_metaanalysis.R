@@ -40,7 +40,6 @@ compute_metaanalysis <- function(df,logger) {
 #' Remove failed meta-analyses.
 #' @param meta_df Meta-analysis output.
 #' @keywords meta-analysis
-#' @export
 #' @examples
 #' get_converged_metadfs(meta_df)
 get_converged_metadfs <- function(meta_df) {
@@ -64,7 +63,6 @@ get_converged_metadfs <- function(meta_df) {
 #' @param input_meta_df Meta-analysis output.
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
-#' @export
 #' @examples
 #' get_summary_stats(input_meta_df,logger)
 get_summary_stats <- function(input_meta_df,logger) {
@@ -92,7 +90,6 @@ get_summary_stats <- function(input_meta_df,logger) {
 #' @param metaanalysis Meta-analysis output.
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
-#' @export
 #' @examples
 #' clean_metaanalysis(metaanalysis,logger)
 clean_metaanalysis <- function(metaanalysis,logger) {

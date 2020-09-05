@@ -59,7 +59,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     }
     if(vibrate==TRUE){
       output_to_return[['features_to_vibrate_over']] = features_of_interest
-      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)#, mtry, num.trees, importance, min.node.size, splitrule)
+      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
       output_to_return[['vibration_variables']] = vibration_output[[2]]
       if(confounder_analysis==TRUE){
         analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis,logger)

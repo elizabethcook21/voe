@@ -11,7 +11,6 @@
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param logger Logger object (default = NULL).
 #' @keywords regression, initial assocatiation
-#' @export
 #' @examples
 #' regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger)
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
@@ -20,7 +19,6 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
   regression_df = regression_df %>% dplyr::select(-sampleID)
   #run regression
     return(tryCatch(broom::tidy(stats::glm(formula=as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,weights=regression_df %>% dplyr::select(regression_weights) %>% unlist %>% unname,data = regression_df)) %>% dplyr::mutate(feature=feature_name),
-             # NOTE: tidy() ends up removing and singularity fits (e.g. NA fits from a feature that, for the dataset's samples all have 0 relative abundance) #####NEED TO LOG THIS SOMEHOW
              warning = function(w) w, # if warning or error, just return them instead of output
              error = function(e) e
     ))
@@ -32,12 +30,12 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
 #' Function to run all associations for dependent and indepenent features.
 #' @param x merged independent an dependent data for a given dataset
 #' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param vibrate TRUE/FALSE -- run vibrations (default=TRUE)
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param logger Logger object (default = NULL).
 #' @keywords regression, initial assocatiation
-#' @export
 #' @examples
 #' run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger)
 run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger){

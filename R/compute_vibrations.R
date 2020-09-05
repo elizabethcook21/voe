@@ -1,4 +1,20 @@
-# Vibrates over a single maximal model for a single feature
+#' Vibration for feature
+#'
+#' Run vibrations for a single feature
+#' @param merged_data Merged independent and dependent data.
+#' @param variables_to_vibrate Variables over which you're going to vibrate.
+#' @param max_vars_in_model Maximum number of variables allowed in in a model.
+#' @param feature Feature over which to vibrate.
+#' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param dataset_id Identifier for dataset.
+#' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+#' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+#' @param max_vibration_num Maximum number of vibrations (default=50000).
+#' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+#' @param logger Logger object (default = NULL).
+#' @keywords regression, initial assocatiation
+#' @examples
+#' vibrate(merged_data,variables_to_vibrate,max_vars_in_model,feature,primary_variable,model_type,regression_weights,max_vibration_num,dataset_id,proportion_cutoff,logger)
 vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,primary_variable,model_type,regression_weights,max_vibration_num,dataset_id,proportion_cutoff,logger){#,mtry,num.trees,importance,min.node.size,splitrule) {
     if(is.null(max_vars_in_model)==FALSE & max_vars_in_model < length(variables_to_vibrate)){
       random_list = sample.int(max_vars_in_model,max_vibration_num,replace=TRUE)
@@ -21,7 +37,24 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
     ))
 }
 
-
+#' Vibration for dataset
+#'
+#' Run vibrations for all features in a dataset
+#' @param subframe List of length 2. Dataframes containing a single datasets independent and dependent data.
+#' @param variables_to_vibrate Variables over which you're going to vibrate.
+#' @param max_vars_in_model Maximum number of variables allowed in in a model.
+#' @param max_vibration_num Maximum number of vibrations (default=50000).
+#' @param feature Feature over which to vibrate.
+#' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param dataset_id Identifier for dataset.
+#' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+#' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done).
+#' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+#' @param cores Number of threads.
+#' @param logger Logger object (default = NULL).
+#' @keywords regression, initial assocatiation
+#' @examples
+#' dataset_vibration(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
 dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){#,mtry,num.trees,importance,min.node.size,splitrule){
   log4r::info(logger,paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
   dep_sub = subframe[[1]]
@@ -33,7 +66,7 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
   if(length(todrop)>1){
     in_sub=in_sub %>% dplyr::select(-all_of(todrop))
   }
-  dep_sub = dep_sub %>% select(sampleID,c(features_of_interest))
+  dep_sub = dep_sub %>% dplyr::select(sampleID,c(features_of_interest))
   variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(sampleID,dplyr::all_of(regression_weights),dplyr::all_of(primary_variable))))
   merged_data=dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub %>% dplyr::mutate_if(is.factor, as.character),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor) ####NEED TO LOG HOW MANY ROWS DROPPED, SIZE OF DF, ETC
   if(as.integer(cores)>1){
@@ -49,8 +82,26 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
   }
 }
 
+#' Vibrations
+#'
+#' Run vibrations for all features for all datasets
+#' @param bound_data Dataframe of tibbles. All independent and depenendent dataframes for all datasets.
+#' @param variables_to_vibrate Variables over which you're going to vibrate.
+#' @param max_vars_in_model Maximum number of variables allowed in in a model.
+#' @param max_vibration_num Maximum number of vibrations (default=50000).
+#' @param feature Feature over which to vibrate.
+#' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param dataset_id Identifier for dataset.
+#' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+#' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done).
+#' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+#' @param cores Number of threads.
+#' @param logger Logger object (default = NULL).
+#' @keywords regression, initial assocatiation
 #' @export
-compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){#,mtry,num.trees,importance,min.node.size,splitrule){
+#' @examples
+#' compute_vibrations(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
+compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){
   output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)))
   output = output %>% dplyr::filter(!is.na(independent_feature))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-sampleID,-primary_variable) %>% colnames))))

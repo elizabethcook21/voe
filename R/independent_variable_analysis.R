@@ -45,7 +45,6 @@ ind_var_analysis <- function(independent_variables, output_location = getwd(),lo
 #' #' @param columnName The name of the column of which data will correspond to the x axis (the different bars of the graph)
 #' #' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
 #' @keywords bar graph
-#' @export
 #' @examples
 #' makeBarGraph(ind_var, names(colTypes[i]),pathToNewFolder))
 makeBarGraph <- function(table, columnName,pathToNewFolder){
@@ -65,7 +64,6 @@ makeBarGraph <- function(table, columnName,pathToNewFolder){
 #' #' @param columnName The name of the column of which data will correspond to the x axis 
 #' #' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
 #' @keywords histogram
-#' @export
 #' @examples
 #' makeHistogram(histogram_tibble, names(colTypes[i]),pathToNewFolder)
 makeHistogram <- function(table, columnName,pathToNewFolder){

@@ -5,7 +5,6 @@
 #' @param vib_df VoE dataframe with columns for each adjuster (output of get_adjuster_expanded_vibrations).
 #' @param logger Logger object (default = NULL).
 #' @keywords voe analysis
-#' @export
 #' @examples
 #' filter_unnest_feature_vib(vib_df,logger)
 filter_unnest_feature_vib <- function(vib_df,logger) {
@@ -19,7 +18,6 @@ filter_unnest_feature_vib <- function(vib_df,logger) {
 #' @param adjusters A dataframe, each column corresponding to the adjusters used in each dataset for vibrations. This is the second entry in the compute_vibrations output. 
 #' @param logger Logger object (default = NULL).
 #' @keywords voe analysis
-#' @export
 #' @examples
 #' get_adjuster_expanded_vibrations(voe_df, adjusters,logger)
 get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
@@ -38,7 +36,6 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
 #' @param voe_list_for_reg A dataframe of expanded VoE output (output of filter_unnest_feature_vib)
 #' @param logger Logger object (default = NULL).
 #' @keywords voe analysis
-#' @export
 #' @examples
 #' find_confounders_linear(voe_list_for_reg, logger)
 find_confounders_linear <- function(voe_list_for_reg,logger){
@@ -76,7 +73,6 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
 #' @param df A dataframe of expanded VoE output (output of filter_unnest_feature_vib)
 #' @param logger Logger object (default = NULL).
 #' @keywords voe analysis
-#' @export
 #' @examples
 #' summarize_vibration_data_by_feature(df, logger)
 summarize_vibration_data_by_feature <- function(df,logger){

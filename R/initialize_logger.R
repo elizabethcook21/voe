@@ -7,13 +7,13 @@
 #' @keywords independent variable
 #' @examples
 #' ind_var_analysis(metadata)
-initialize_logger <- function(fileName, saveLog, logFilePath){
+initialize_logger <- function(fileName, saveLog = TRUE, logFilePath = NULL){
 
   if(saveLog == TRUE){
     if(is.null(logFilePath)){
       my_logfile = paste0('logfile_',fileName, '.txt')
     }else{
-      my_logfile = paste0(logFilePath,'_logfile_',fileName, '.txt')
+      my_logfile = paste0(logFilePath,'/logfile_',fileName, '.txt')
     }
     
     my_console_appender = log4r::console_appender()

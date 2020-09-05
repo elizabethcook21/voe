@@ -13,7 +13,7 @@
 #' @keywords regression, initial assocatiation
 #' @export
 #' @examples
-#' regression(df,logger)
+#' regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger)
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
   feature_name = colnames(dependent_variables)[j+1]
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),c(feature_name)),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
@@ -39,7 +39,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
 #' @keywords regression, initial assocatiation
 #' @export
 #' @examples
-#' run_associations(df,logger)
+#' run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger)
 run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger){
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
@@ -98,7 +98,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 #' @keywords regression, initial assocatiation
 #' @export
 #' @examples
-#' compute_initial_associations(df,logger)
+#' compute_initial_associations(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger)
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights, logger))
     output_regs = purrr::map(output, function(x) x[[1]])

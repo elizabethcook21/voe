@@ -1,0 +1,75 @@
+
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin17.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(testthat)
+> library(voe)
+> 
+> test_check("voe")
+── 1. Error: linear regression works (@test-compute_associations.R#2)  ─────────
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/metadata_for_test.rds")
+ 2. base::gzfile(file, "rb")
+
+── 2. Error: logistic regression works (@test-compute_associations.R#11)  ──────
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/metadata_for_test.rds")
+ 2. base::gzfile(file, "rb")
+
+── 3. Error: meta-analysis works (@test-compute_metaanalysis.R#2)  ─────────────
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/sample_association_output.rds")
+ 2. base::gzfile(file, "rb")
+
+── 4. Error: vibrations function appropriately (@test-compute_vibrations.R#2)  ─
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/metadata_for_test.rds")
+ 2. base::gzfile(file, "rb")
+
+── 5. Error: metadata analysis works (@test-independent_variable_analysis.R#2)  
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/metadata_for_test.rds")
+ 2. base::gzfile(file, "rb")
+
+── 6. Error: non-meta-analytic pipeline works (@test-voe_pipeline.R#2)  ────────
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/metadata_for_test.rds")
+ 2. base::gzfile(file, "rb")
+
+── 7. Error: meta-analytic pipeline works (@test-voe_pipeline.R#9)  ────────────
+cannot open the connection
+Backtrace:
+ 1. base::readRDS("../../data/metadata_for_test.rds")
+ 2. base::gzfile(file, "rb")
+
+══ testthat results  ═══════════════════════════════════════════════════════════
+[ OK: 0 | SKIPPED: 0 | WARNINGS: 7 | FAILED: 7 ]
+1. Error: linear regression works (@test-compute_associations.R#2) 
+2. Error: logistic regression works (@test-compute_associations.R#11) 
+3. Error: meta-analysis works (@test-compute_metaanalysis.R#2) 
+4. Error: vibrations function appropriately (@test-compute_vibrations.R#2) 
+5. Error: metadata analysis works (@test-independent_variable_analysis.R#2) 
+6. Error: non-meta-analytic pipeline works (@test-voe_pipeline.R#2) 
+7. Error: meta-analytic pipeline works (@test-voe_pipeline.R#9) 
+
+Error: testthat unit tests failed
+Execution halted

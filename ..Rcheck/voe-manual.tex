@@ -1,0 +1,826 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8]{inputenc} % @SET ENCODING@
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `voe'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\inputencoding{utf8}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Modeling vibrational effects in observational data.}
+\item[Version]\AsIs{0.1.0}
+\item[Author]\AsIs{Braden Tierney [aut], Elizabeth Anderson [aut], Yingxuan Tan [aut]}
+\item[Maintainer]\AsIs{Braden Tierney }\email{btierney@g.harvard.edu}\AsIs{}
+\item[Description]\AsIs{Description of the tool.
+Use four spaces when indenting paragraphs within the Description.}
+\item[License]\AsIs{MIT}
+\item[Encoding]\AsIs{UTF-8}
+\item[LazyData]\AsIs{true}
+\item[Imports]\AsIs{tidyverse, readxl, dplyr, furrr, future, log4r, lme4,
+broom.mixed, lmerTest, tibble, purrr, tidyr, magrittr, getopt,
+devtools, broom, stringr, rlang, meta, metafor, ggplot2, broom,
+cowplot, rje, ggplot2}
+\item[RoxygenNote]\AsIs{7.1.1}
+\item[Suggests]\AsIs{testthat}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{analyze\_voe\_data}{Analyze VoE data}{analyze.Rul.voe.Rul.data}
+\keyword{analysis}{analyze\_voe\_data}
+\keyword{voe}{analyze\_voe\_data}
+%
+\begin{Description}\relax
+Post-process vibration output.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+analyze_voe_data(vibration_output, confounder_analysis, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{vibration\_output}] Output list from the compute vibrations function.
+
+\item[\code{confounder\_analysis}] TRUE/FALSE -- run confounder analysis (default = TRUE).
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+analyze_voe_data(vibration_output,confounder_analysis,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{clean\_metaanalysis}{Clean meta-analysis output and get summary statistics.}{clean.Rul.metaanalysis}
+\keyword{meta-analysis}{clean\_metaanalysis}
+%
+\begin{Description}\relax
+Export meta-analysis.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+clean_metaanalysis(metaanalysis, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{metaanalysis}] Meta-analysis output.
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+clean_metaanalysis(metaanalysis,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{compute\_initial\_associations}{Deploy associations across datasets}{compute.Rul.initial.Rul.associations}
+\keyword{assocatiation}{compute\_initial\_associations}
+\keyword{initial}{compute\_initial\_associations}
+\keyword{regression,}{compute\_initial\_associations}
+%
+\begin{Description}\relax
+Top-level function to run all associations for all datasets.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+compute_initial_associations(
+  bound_data,
+  primary_variable,
+  model_type,
+  proportion_cutoff,
+  vibrate,
+  regression_weights,
+  logger
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{bound\_data}] merged independent an dependent data for all datasets
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+
+\item[\code{vibrate}] TRUE/FALSE -- run vibrations (default=TRUE)
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+compute_initial_associations(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{compute\_metaanalysis}{Run meta-analysis}{compute.Rul.metaanalysis}
+\keyword{meta-analysis}{compute\_metaanalysis}
+%
+\begin{Description}\relax
+Run meta-analysis for each feature
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+compute_metaanalysis(df, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{df}] Association output.
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+compute_metaanalysis(df,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{compute\_vibrations}{Vibrations}{compute.Rul.vibrations}
+\keyword{assocatiation}{compute\_vibrations}
+\keyword{initial}{compute\_vibrations}
+\keyword{regression,}{compute\_vibrations}
+%
+\begin{Description}\relax
+Run vibrations for all features for all datasets
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+compute_vibrations(
+  bound_data,
+  primary_variable,
+  model_type,
+  features_of_interest,
+  max_vibration_num,
+  proportion_cutoff,
+  regression_weights,
+  cores,
+  logger,
+  max_vars_in_model
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{bound\_data}] Dataframe of tibbles. All independent and depenendent dataframes for all datasets.
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done).
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{cores}] Number of threads.
+
+\item[\code{logger}] Logger object (default = NULL).
+
+\item[\code{max\_vars\_in\_model}] Maximum number of variables allowed in in a model.
+
+\item[\code{variables\_to\_vibrate}] Variables over which you're going to vibrate.
+
+\item[\code{feature}] Feature over which to vibrate.
+
+\item[\code{dataset\_id}] Identifier for dataset.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+compute_vibrations(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{dataset\_vibration}{Vibration for dataset}{dataset.Rul.vibration}
+\keyword{assocatiation}{dataset\_vibration}
+\keyword{initial}{dataset\_vibration}
+\keyword{regression,}{dataset\_vibration}
+%
+\begin{Description}\relax
+Run vibrations for all features in a dataset
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+dataset_vibration(
+  subframe,
+  primary_variable,
+  model_type,
+  features_of_interest,
+  max_vibration_num,
+  proportion_cutoff,
+  regression_weights,
+  cores,
+  logger,
+  max_vars_in_model
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{subframe}] List of length 2. Dataframes containing a single datasets independent and dependent data.
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done).
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{cores}] Number of threads.
+
+\item[\code{logger}] Logger object (default = NULL).
+
+\item[\code{max\_vars\_in\_model}] Maximum number of variables allowed in in a model.
+
+\item[\code{variables\_to\_vibrate}] Variables over which you're going to vibrate.
+
+\item[\code{feature}] Feature over which to vibrate.
+
+\item[\code{dataset\_id}] Identifier for dataset.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+dataset_vibration(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{filter\_unnest\_feature\_vib}{Unnest vibration data}{filter.Rul.unnest.Rul.feature.Rul.vib}
+\keyword{analysis}{filter\_unnest\_feature\_vib}
+\keyword{voe}{filter\_unnest\_feature\_vib}
+%
+\begin{Description}\relax
+Unnest regression output for vibrations.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+filter_unnest_feature_vib(vib_df, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{vib\_df}] VoE dataframe with columns for each adjuster (output of get\_adjuster\_expanded\_vibrations).
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+filter_unnest_feature_vib(vib_df,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{find\_confounders\_linear}{Find confounders}{find.Rul.confounders.Rul.linear}
+\keyword{analysis}{find\_confounders\_linear}
+\keyword{voe}{find\_confounders\_linear}
+%
+\begin{Description}\relax
+Model confounding from vibration analysis.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+find_confounders_linear(voe_list_for_reg, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{voe\_list\_for\_reg}] A dataframe of expanded VoE output (output of filter\_unnest\_feature\_vib)
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+find_confounders_linear(voe_list_for_reg, logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{full\_voe\_pipeline}{Full VoE Pipeline}{full.Rul.voe.Rul.pipeline}
+\keyword{pipeline}{full\_voe\_pipeline}
+%
+\begin{Description}\relax
+This function will run the full pipeline
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+full_voe_pipeline(
+  dependent_variables,
+  independent_variables,
+  primary_variable,
+  vibrate = TRUE,
+  fdr_method = "BY",
+  fdr_cutoff = 0.05,
+  max_vibration_num = 50000,
+  regression_weights = NULL,
+  max_vars_in_model = NULL,
+  proportion_cutoff = 0.95,
+  meta_analysis = FALSE,
+  model_type = "gaussian",
+  log = FALSE,
+  cores = 1,
+  confounder_analysis = TRUE,
+  log_file_path = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{dependent\_variables}] A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
+
+\item[\code{independent\_variables}] A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent\_variables tibble.
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{vibrate}] TRUE/FALSE -- run vibrations (default=TRUE)
+
+\item[\code{fdr\_method}] Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
+
+\item[\code{fdr\_cutoff}] Cutoff for an FDR significant association (default = 0.05).
+
+\item[\code{max\_vibration\_num}] Maximum number of vibrations (default=50000).
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{max\_vars\_in\_model}] Maximum number of variables allowed in a single fit (for vibrations). (default=NULL)
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+
+\item[\code{meta\_analysis}] TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{log}] TRUE/FALSE. Save output to log file.
+
+\item[\code{cores}] Number of cores to use for vibration (default = 1).
+
+\item[\code{confounder\_analysis}] Run mixed effect confounder analysis (default=TRUE).
+
+\item[\code{log\_file\_path}] Location where you would like logfile to be saved if log==TRUE (default=NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+full_voe_pipeline(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{get\_adjuster\_expanded\_vibrations}{Expand vibration data}{get.Rul.adjuster.Rul.expanded.Rul.vibrations}
+\keyword{analysis}{get\_adjuster\_expanded\_vibrations}
+\keyword{voe}{get\_adjuster\_expanded\_vibrations}
+%
+\begin{Description}\relax
+Add column to vibration output for each adjuster (indicating presence or absence in a model).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+get_adjuster_expanded_vibrations(voe_df, adjusters, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{voe\_df}] Raw vibration output, the first entry in the output of compute\_vibrations.
+
+\item[\code{adjusters}] A dataframe, each column corresponding to the adjusters used in each dataset for vibrations. This is the second entry in the compute\_vibrations output.
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+get_adjuster_expanded_vibrations(voe_df, adjusters,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{get\_converged\_metadfs}{Filter-meta analysis}{get.Rul.converged.Rul.metadfs}
+\keyword{meta-analysis}{get\_converged\_metadfs}
+%
+\begin{Description}\relax
+Remove failed meta-analyses.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+get_converged_metadfs(meta_df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{meta\_df}] Meta-analysis output.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+get_converged_metadfs(meta_df)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{get\_summary\_stats}{Extract meta-analysis summary statistics}{get.Rul.summary.Rul.stats}
+\keyword{meta-analysis}{get\_summary\_stats}
+%
+\begin{Description}\relax
+Remove failed meta-analyses.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+get_summary_stats(input_meta_df, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{input\_meta\_df}] Meta-analysis output.
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+get_summary_stats(input_meta_df,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{ind\_var\_analysis}{Analysis of Independent Variables}{ind.Rul.var.Rul.analysis}
+\keyword{independent}{ind\_var\_analysis}
+\keyword{variable}{ind\_var\_analysis}
+%
+\begin{Description}\relax
+This function will run the full pipeline
+\#' @param independent\_variables A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent\_variables tibble.
+\#' @param output\_location The path where you want to save all the ggplots and metadata
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+ind_var_analysis(
+  independent_variables,
+  output_location = getwd(),
+  log = TRUE,
+  log_file_path = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Examples}
+\begin{ExampleCode}
+ind_var_analysis(metadata)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{initialize\_logger}{Logger}{initialize.Rul.logger}
+\keyword{logging}{initialize\_logger}
+%
+\begin{Description}\relax
+Initialize logging
+\#' @param fileName
+\#' @param saveLog 
+\#' @param logFilePath
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+initialize_logger(fileName, saveLog, logFilePath)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Examples}
+\begin{ExampleCode}
+ind_var_analysis(metadata)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{makeBarGraph}{Making a Bar Graph}{makeBarGraph}
+\keyword{bar}{makeBarGraph}
+\keyword{graph}{makeBarGraph}
+%
+\begin{Description}\relax
+This function will create a Bar Graph for discrete data 
+\#' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent\_variables tibble.
+\#' @param columnName The name of the column of which data will correspond to the x axis (the different bars of the graph)
+\#' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+makeBarGraph(table, columnName, pathToNewFolder)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Examples}
+\begin{ExampleCode}
+makeBarGraph(ind_var, names(colTypes[i]),pathToNewFolder))
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{makeHistogram}{Making a Histogram}{makeHistogram}
+\keyword{histogram}{makeHistogram}
+%
+\begin{Description}\relax
+This function will create a Bar Graph for discrete data 
+\#' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent\_variables tibble.
+\#' @param columnName The name of the column of which data will correspond to the x axis 
+\#' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+makeHistogram(table, columnName, pathToNewFolder)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Examples}
+\begin{ExampleCode}
+makeHistogram(histogram_tibble, names(colTypes[i]),pathToNewFolder)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{pre\_pipeline\_data\_check}{Pre-flight checks}{pre.Rul.pipeline.Rul.data.Rul.check}
+\keyword{pipeline}{pre\_pipeline\_data\_check}
+%
+\begin{Description}\relax
+Check datasets and print pre-run statistics prior to deployment.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+pre_pipeline_data_check(
+  dependent_variables,
+  independent_variables,
+  primary_variable,
+  fdr_method,
+  fdr_cutoff,
+  max_vibration_num,
+  max_vars_in_model,
+  proportion_cutoff,
+  meta_analysis,
+  model_type,
+  logger
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{dependent\_variables}] A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
+
+\item[\code{independent\_variables}] A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent\_variables tibble.
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{fdr\_method}] Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
+
+\item[\code{fdr\_cutoff}] Cutoff for an FDR significant association (default = 0.05).
+
+\item[\code{max\_vibration\_num}] Maximum number of vibrations (default=50000).
+
+\item[\code{max\_vars\_in\_model}] Maximum number of variables allowed in a single fit (for vibrations). (default=NULL)
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+
+\item[\code{meta\_analysis}] TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{logger}] Logger object (default = NULL).
+
+\item[\code{vibrate}] TRUE/FALSE -- run vibrations (default=TRUE)
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{regression}{Run initial association}{regression}
+\keyword{assocatiation}{regression}
+\keyword{initial}{regression}
+\keyword{regression,}{regression}
+%
+\begin{Description}\relax
+Run initial association for a single feature
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+regression(
+  j,
+  independent_variables,
+  dependent_variables,
+  primary_variable,
+  model_type,
+  proportion_cutoff,
+  regression_weights,
+  logger
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{j}] feature name
+
+\item[\code{independent\_variables}] A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent\_variables tibble.
+
+\item[\code{dependent\_variables}] A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{run\_associations}{Run all associations for a given dataset}{run.Rul.associations}
+\keyword{assocatiation}{run\_associations}
+\keyword{initial}{run\_associations}
+\keyword{regression,}{run\_associations}
+%
+\begin{Description}\relax
+Function to run all associations for dependent and indepenent features.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+run_associations(
+  x,
+  primary_variable,
+  model_type,
+  proportion_cutoff,
+  vibrate,
+  regression_weights,
+  logger
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] merged independent an dependent data for a given dataset
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{summarize\_vibration\_data\_by\_feature}{summarize\_vibration\_data\_by\_feature}{summarize.Rul.vibration.Rul.data.Rul.by.Rul.feature}
+\keyword{analysis}{summarize\_vibration\_data\_by\_feature}
+\keyword{voe}{summarize\_vibration\_data\_by\_feature}
+%
+\begin{Description}\relax
+Summarize output of vibrations for each dependent feature of interest.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+summarize_vibration_data_by_feature(df, logger)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{df}] A dataframe of expanded VoE output (output of filter\_unnest\_feature\_vib)
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+summarize_vibration_data_by_feature(df, logger)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{vibrate}{Vibration for feature}{vibrate}
+\keyword{assocatiation}{vibrate}
+\keyword{initial}{vibrate}
+\keyword{regression,}{vibrate}
+%
+\begin{Description}\relax
+Run vibrations for a single feature
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+vibrate(
+  merged_data,
+  variables_to_vibrate,
+  max_vars_in_model,
+  feature,
+  primary_variable,
+  model_type,
+  regression_weights,
+  max_vibration_num,
+  dataset_id,
+  proportion_cutoff,
+  logger
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{merged\_data}] Merged independent and dependent data.
+
+\item[\code{variables\_to\_vibrate}] Variables over which you're going to vibrate.
+
+\item[\code{max\_vars\_in\_model}] Maximum number of variables allowed in in a model.
+
+\item[\code{feature}] Feature over which to vibrate.
+
+\item[\code{primary\_variable}] The column name from the independent\_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+
+\item[\code{model\_type}] Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+
+\item[\code{regression\_weights}] Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
+
+\item[\code{dataset\_id}] Identifier for dataset.
+
+\item[\code{proportion\_cutoff}] Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
+
+\item[\code{logger}] Logger object (default = NULL).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+vibrate(merged_data,variables_to_vibrate,max_vars_in_model,feature,primary_variable,model_type,regression_weights,max_vibration_num,dataset_id,proportion_cutoff,logger)
+\end{ExampleCode}
+\end{Examples}
+\printindex{}
+\end{document}

@@ -9,5 +9,10 @@ test_that("meta-analytic pipeline works", {
 	metadata = readRDS('../../data/metadata_for_test.rds')
 	abundance = readRDS('../../data/abundance_data_for_test.rds')
 	abundance = abundance[,1:100]
+<<<<<<< HEAD
   	expect_error(full_voe_pipeline(list('dataset1'=abundance,'dataset2'=abundance),list('dataset1'=metadata,'dataset2'=metadata),regression_weights=NULL,model_type='gaussian',primary_variable='BMI',max_vars_in_model=20,fdr_method='BY',fdr_cutoff=0.99,max_vibration_num=10,proportion_cutoff = 0.9, meta_analysis=TRUE, cores =1, log=FALSE), regexp = NA)
 })
+=======
+  	expect_error(full_voe_pipeline(list('dataset1'=abundance,'dataset2'=abundance),list('dataset1'=metadata,'dataset2'=metadata),model_type='gaussian',primary_variable='BMI',fdr_method='BY',fdr_cutoff=0.99,max_vibration_num=10,proportion_cutoff = 0.9, meta_analysis=TRUE, cores =1, log=FALSE), regexp = NA)
+})
+>>>>>>> 6969f355283d3e4cb4725fcf1e41731d2db03b53

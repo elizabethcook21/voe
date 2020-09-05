@@ -1,0 +1,68 @@
+---
+title: "voe_pipeline_figs.Rmd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(RColorBrewer)
+```
+
+```{r}
+#NHANES
+setwd('~/GitHub/voe')
+
+load('data/nhanes9904_VoE.Rdata')
+
+nhanes_data = readRDS('nhanes_output.rds')
+
+vibration_output = nhanes_data$vibration_output
+confounder_analysis = vibration_output$confounder_analysis
+confounder_analysis = left_join(confounder_analysis,dictionary %>% select(varname,variable_description),by=c('term'='varname')) %>% filter(!is.na(variable_description))
+vibration_data = vibration_output$data
+
+ggplot(data = vibration_data, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=50)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-2.2,2.2) + theme(legend.text=element_text(size=6))+ggtitle('Vibration of effects between dietary fiber intake and BMI')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) 
+ggsave('bmi_fiber.pdf',width=6,height=6)
+
+top_confounder_analysis = confounder_analysis %>% filter(p.value<0.05) %>% arrange(desc(estimate)) %>% head(25)
+bottom_confounder_analysis = confounder_analysis%>% filter(p.value<0.05) %>% arrange(desc(estimate)) %>% tail(25)
+
+ggplot(data = top_confounder_analysis,aes(x=reorder(variable_description,(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+geom_errorbar(aes(ymin =sdmin,ymax=sdmax,width=.9))
+ggsave('inflating_confounder_analysis.pdf',width=6,height=6)
+ggplot(data = bottom_confounder_analysis,aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+geom_errorbar(aes(ymin =sdmin,ymax=sdmax,width=.9))
+ggsave('defflating_confounder_analysis.pdf',width=6,height=6)
+
+vibration_data_sub1 = vibration_data %>% filter(DR1TMAGN==1) %>% select(estimate,p.value) %>% mutate(var='Magnesium')
+vibration_data_sub2 = vibration_data %>% filter(quantity_drink_per_day==1) %>% select(estimate,p.value) %>% mutate(var='Drinks per day')
+vibration_data_sub = bind_rows(vibration_data_sub1,vibration_data_sub2)
+ggplot(data = vibration_data_sub, aes(x = estimate, y = -log10(p.value),color=as.factor(var))) +geom_point(alpha=.5)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-2.2,2.2) + theme(legend.text=element_text(size=6))+ggtitle('Vibration of effects between dietary fiber intake and BMI')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) 
+ggsave('magnesium_dpd.png',width=6,height=6)
+
+
+fit_estimate=stats::lm(data=vibration_data %>% dplyr::select_if(~ length(unique(.)) > 1) %>% select(-c(full_fits,statistic,p.value,std.error)),as.formula(estimate ~ . - estimate))
+
+confounder_analysis2 = tidy(fit_estimate)
+confounder_analysis2=left_join(confounder_analysis2,dictionary %>% select(varname,variable_description),by=c('term'='varname')) %>% filter(!is.na(variable_description))
+
+top_confounder_analysis = confounder_analysis2 %>% filter(p.value<0.05) %>% arrange(desc(estimate)) %>% head(25) %>% mutate(sdmin = estimate - std.error, sdmax = estimate + std.error)
+bottom_confounder_analysis = confounder_analysis2%>% filter(p.value<0.05) %>% arrange(desc(estimate)) %>% tail(25) %>% mutate(sdmin = estimate - std.error, sdmax = estimate + std.error)
+
+ggplot(data = top_confounder_analysis,aes(x=reorder(variable_description,(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+geom_errorbar(aes(ymin =sdmin,ymax=sdmax,width=.9))
+ggsave('inflating_confounder_analysis2.pdf',width=6,height=6)
+ggplot(data = bottom_confounder_analysis,aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+geom_errorbar(aes(ymin =sdmin,ymax=sdmax,width=.9))
+ggsave('defflating_confounder_analysis2.pdf',width=6,height=6)
+
+vibration_data_sub1 = vibration_data %>% filter(DR1TMAGN==1) %>% select(estimate,p.value) %>% mutate(var='Magnesium')
+vibration_data_sub2 = vibration_data %>% filter(BMXWAIST==1) %>% select(estimate,p.value) %>% mutate(var='Waist circumference')
+vibration_data_sub = bind_rows(vibration_data_sub1,vibration_data_sub2)
+ggplot(data = vibration_data_sub, aes(x = estimate, y = -log10(p.value),color=as.factor(var))) +geom_point(alpha=.5)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-2.2,2.2) + theme(legend.text=element_text(size=6))+ggtitle('Vibration of effects between dietary fiber intake and BMI')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) 
+ggsave('magnesium_dpd.png',width=6,height=6)
+
+
+
+```

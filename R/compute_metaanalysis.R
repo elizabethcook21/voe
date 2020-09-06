@@ -6,6 +6,8 @@
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @export
+#' @importFrom rlang .data
+#' @importFrom magrittr "%>%"
 #' @examples
 #' compute_metaanalysis(df,logger)
 compute_metaanalysis <- function(df,logger) {
@@ -14,12 +16,12 @@ compute_metaanalysis <- function(df,logger) {
   features=unique(df$feature)
   for (i in seq_along(features)) {
     new_colname = features[[i]]
-    df_sub = df %>% dplyr::filter(feature==features[[i]])
+    df_sub = df %>% dplyr::filter(.data$feature==features[[i]])
     number_datasets = nrow(df_sub)
-    new_df =new_df %>% dplyr::mutate(new = list(tryCatch(meta::metagen(estimate,
+    new_df = new_df %>% dplyr::mutate(new = list(tryCatch(meta::metagen(estimate,
                                                    std.error,
                                                    data = df_sub,
-                                                   studlab = dataset_id,
+                                                   studlab = .data$dataset_id,
                                                    comb.fixed = FALSE,
                                                    comb.random = TRUE, # random effects model
                                                    method.tau = 'REML', # using REML estimator for tau heterogeneity parameter
@@ -30,9 +32,9 @@ compute_metaanalysis <- function(df,logger) {
                                            warning = function(w) w, # if warning return warning, don't want results at all to keep data and outputs as clean as possible (previously outputted list of 2, results and warnings)
                                            error = function(e) e))  # if results in error, return error
     )
-    new_df = new_df %>% dplyr::rename(!!features[[i]]:=new)
+    new_df = new_df %>% dplyr::rename(!!features[[i]]:=.data$new)
   }
-  return(new_df %>% dplyr::select(-analysis)) # remove placeholder column
+  return(new_df %>% dplyr::select(-.data$analysis)) # remove placeholder column
 }
 
 #' Filter-meta analysis
@@ -40,6 +42,8 @@ compute_metaanalysis <- function(df,logger) {
 #' Remove failed meta-analyses.
 #' @param meta_df Meta-analysis output.
 #' @keywords meta-analysis
+#' @importFrom rlang .data
+#' @importFrom magrittr "%>%"
 #' @examples
 #' get_converged_metadfs(meta_df)
 get_converged_metadfs <- function(meta_df) {
@@ -63,6 +67,8 @@ get_converged_metadfs <- function(meta_df) {
 #' @param input_meta_df Meta-analysis output.
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
+#' @importFrom rlang .data
+#' @importFrom magrittr "%>%"
 #' @examples
 #' get_summary_stats(input_meta_df,logger)
 get_summary_stats <- function(input_meta_df,logger) {
@@ -75,9 +81,9 @@ get_summary_stats <- function(input_meta_df,logger) {
       feature = colnames(meta_df),
       estimate = purrr::map_dbl(meta_df, ~.[[1]]$TE.random),
       p.val = purrr::map_dbl(meta_df, ~.[[1]]$pval.random),
-      bonferroni = p.adjust(p.val, method = "bonferroni"),
-      BH = p.adjust(p.val, method = "fdr"),
-      BY = p.adjust(p.val, method = "BY"),
+      bonferroni = stats::p.adjust(.data$p.val, method = "bonferroni"),
+      BH = stats::p.adjust(.data$p.val, method = "fdr"),
+      BY = stats::p.adjust(.data$p.val, method = "BY"),
       CI_95_lower = purrr::map_dbl(meta_df, ~.[[1]]$lower.random),
       CI_95_upper = purrr::map_dbl(meta_df, ~.[[1]]$upper.random)
     )
@@ -90,6 +96,8 @@ get_summary_stats <- function(input_meta_df,logger) {
 #' @param metaanalysis Meta-analysis output.
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
+#' @importFrom rlang .data 
+#' @importFrom magrittr "%>%"
 #' @examples
 #' clean_metaanalysis(metaanalysis,logger)
 clean_metaanalysis <- function(metaanalysis,logger) {

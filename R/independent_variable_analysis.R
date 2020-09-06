@@ -2,6 +2,9 @@
 #'
 #' This function will run the full pipeline
 #' #' @param independent_variables A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' #' @param output_location  Folder where you want to save the output, default current working directory 
+#' #' @param log TRUE/FALSE, indicates if you want to use the logging feature.  
+#' #' @param log_file_path Path to where logfile will be saved (default = NULL). 
 #' #' @param output_location The path where you want to save all the ggplots and metadata
 #' @keywords independent variable
 #' @export

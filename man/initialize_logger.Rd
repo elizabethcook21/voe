@@ -4,7 +4,7 @@
 \alias{initialize_logger}
 \title{Logger}
 \usage{
-initialize_logger(fileName, saveLog, logFilePath)
+initialize_logger(fileName, saveLog = TRUE, logFilePath = NULL)
 }
 \description{
 Initialize logging

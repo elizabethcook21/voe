@@ -14,6 +14,8 @@
 #' @param meta_analysis TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
 #' @param logger Logger object (default = NULL).
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
 #' @keywords pipeline
 #' @examples
 #' pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger)
@@ -32,7 +34,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
     num_ind = purrr::map(independent_variables, function(x) ncol(x)-1)
-    data_summary = dplyr::bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset_number=seq_along(num_features))    %>% dplyr::mutate(max_models_per_feature = `Number of adjusters`*max_vibration_num)
+    data_summary = dplyr::bind_cols(list('Number of features' = unlist(unname(num_features)),'Number of samples' = unlist(unname(num_samples)),'Number of adjusters' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset_number=seq_along(num_features)) %>% dplyr::mutate(max_models_per_feature = .data$`Number of adjusters`*max_vibration_num)
     message('Preparing to run pipeline with the following parameters:')
     print((data_summary))
     Sys.sleep(2)

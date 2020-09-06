@@ -15,4 +15,4 @@ Imports: tidyverse, readxl, dplyr, furrr, future, log4r, lme4,
         cowplot, rje, ggplot2
 RoxygenNote: 7.1.1
 Suggests: testthat
-Built: R 4.0.2; ; 2020-09-04 23:51:29 UTC; unix
+Built: R 4.0.2; ; 2020-09-06 02:34:34 UTC; unix

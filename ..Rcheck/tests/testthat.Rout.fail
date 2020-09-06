@@ -49,6 +49,9 @@ Backtrace:
  1. base::readRDS("../../data/metadata_for_test.rds")
  2. base::gzfile(file, "rb")
 
+INFO  [2020-09-05 19:35:29] You created a logger that is set to defaults: to save a log in the current working directory
+INFO  [2020-09-05 19:35:29] You created a logger that should not save a logfile
+INFO  [2020-09-05 19:35:29] You created a logger that should save a file to the Desktop
 ── 6. Error: non-meta-analytic pipeline works (@test-voe_pipeline.R#2)  ────────
 cannot open the connection
 Backtrace:
@@ -62,7 +65,7 @@ Backtrace:
  2. base::gzfile(file, "rb")
 
 ══ testthat results  ═══════════════════════════════════════════════════════════
-[ OK: 0 | SKIPPED: 0 | WARNINGS: 7 | FAILED: 7 ]
+[ OK: 3 | SKIPPED: 0 | WARNINGS: 7 | FAILED: 7 ]
 1. Error: linear regression works (@test-compute_associations.R#2) 
 2. Error: logistic regression works (@test-compute_associations.R#11) 
 3. Error: meta-analysis works (@test-compute_metaanalysis.R#2) 

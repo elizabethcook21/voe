@@ -18,6 +18,8 @@
 #' @param confounder_analysis Run mixed effect confounder analysis (default=TRUE).
 #' @param log TRUE/FALSE. Save output to log file.
 #' @param log_file_path Location where you would like logfile to be saved if log==TRUE (default=NULL).
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
 #' @keywords pipeline
 #' @export
 #' @examples
@@ -48,10 +50,10 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       metaanalysis <- compute_metaanalysis(association_output,logger)
       metaanalysis_cleaned <- clean_metaanalysis(metaanalysis,logger)
       output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
-      features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
+      features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(.data$feature)
     }
     else{
-      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(feature)
+      features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(.data$feature)
    }
     if(length(unlist(unname(features_of_interest)))==0){
       log4r::info(logger,'No significant features found, consider adjusting parameters or data and trying again.')

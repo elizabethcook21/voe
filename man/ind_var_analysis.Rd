@@ -7,7 +7,7 @@
 ind_var_analysis(
   independent_variables,
   output_location = getwd(),
-  log = TRUE,
+  log = FALSE,
   log_file_path = NULL
 )
 }

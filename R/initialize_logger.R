@@ -1,9 +1,9 @@
 #' Logger
 #'
 #' Initialize logging
-#' #' @param fileName
-#' #' @param saveLog 
-#' #' @param logFilePath 
+#' #' @param fileName Name of logfile
+#' #' @param saveLog TRUE/FALSE to save the logfile or not
+#' #' @param logFilePath if saveLog=TRUE, path to directory where logfile will be saved.
 #' @keywords logging
 #' @examples
 #' ind_var_analysis(metadata)

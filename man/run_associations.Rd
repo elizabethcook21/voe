@@ -23,6 +23,8 @@ run_associations(
 
 \item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)}
 
+\item{vibrate}{TRUE/FALSE -- run vibrations (default=TRUE)}
+
 \item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
 
 \item{logger}{Logger object (default = NULL).}

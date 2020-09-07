@@ -14,7 +14,4 @@ clean_metaanalysis(metaanalysis, logger)
 \description{
 Export meta-analysis.
 }
-\examples{
-clean_metaanalysis(metaanalysis,logger)
-}
 \keyword{meta-analysis}

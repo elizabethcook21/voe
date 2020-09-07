@@ -1,3 +1,15 @@
+#' Meta-analysis function
+#'
+#' metagen function
+#' @param a estimates
+#' @param b standard errors
+#' @param c study labels
+#' @keywords meta-analysis
+#' @export
+#' @importFrom dplyr %>%
+meta_analysis_command <- function(a,b,c){
+return(list(tryCatch(meta::metagen(TE = a,seTE = b, studlab = c,comb.fixed = FALSE, comb.random = TRUE, method.tau = 'REML', hakn = FALSE, prediction = TRUE,sm = "SMD",control=list(maxiter=1000)),  warning = function(w) w, error = function(e) e)))
+}
 
 #' Run meta-analysis
 #'
@@ -7,34 +19,26 @@
 #' @keywords meta-analysis
 #' @export
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
-#' @examples
-#' compute_metaanalysis(df,logger)
+#' @importFrom dplyr %>%
+#' @importFrom rlang :=
 compute_metaanalysis <- function(df,logger) {
   new_df <- tibble::tibble(analysis = "meta-analysis") # create new tibble with placeholder column
   log4r::info(logger,'Computing meta-analysis')
   features=unique(df$feature)
+  ma_output_all = list()
   for (i in seq_along(features)) {
     new_colname = features[[i]]
     df_sub = df %>% dplyr::filter(.data$feature==features[[i]])
-    number_datasets = nrow(df_sub)
-    new_df = new_df %>% dplyr::mutate(new = list(tryCatch(meta::metagen(estimate,
-                                                   std.error,
-                                                   data = df_sub,
-                                                   studlab = .data$dataset_id,
-                                                   comb.fixed = FALSE,
-                                                   comb.random = TRUE, # random effects model
-                                                   method.tau = 'REML', # using REML estimator for tau heterogeneity parameter
-                                                   hakn = FALSE, # not using that conserative estimator adjuster
-                                                   prediction = TRUE,
-                                                   sm = "SMD",
-                                                   control=list(maxiter=1000)), # using 10x default max iteractions
-                                           warning = function(w) w, # if warning return warning, don't want results at all to keep data and outputs as clean as possible (previously outputted list of 2, results and warnings)
-                                           error = function(e) e))  # if results in error, return error
-    )
-    new_df = new_df %>% dplyr::rename(!!features[[i]]:=.data$new)
+    a=df_sub$estimate
+    b=df_sub$std.error
+    c=df_sub$dataset_id
+    meta_analysis_output <- tibble::tibble(meta_analysis_command(a,b,c)) 
+    ma_output_all[[new_colname]] = meta_analysis_output
+    print(meta_analysis_output[[1]])
   }
-  return(new_df %>% dplyr::select(-.data$analysis)) # remove placeholder column
+  ma_output_all_df= ma_output_all %>% dplyr::bind_cols()
+  colnames(ma_output_all_df) = names(ma_output_all)
+  return(ma_output_all_df) # remove placeholder column
 }
 
 #' Filter-meta analysis
@@ -43,9 +47,7 @@ compute_metaanalysis <- function(df,logger) {
 #' @param meta_df Meta-analysis output.
 #' @keywords meta-analysis
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
-#' @examples
-#' get_converged_metadfs(meta_df)
+#' @importFrom dplyr "%>%"
 get_converged_metadfs <- function(meta_df) {
   toremove=list()
   count=0
@@ -68,9 +70,7 @@ get_converged_metadfs <- function(meta_df) {
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
-#' @examples
-#' get_summary_stats(input_meta_df,logger)
+#' @importFrom dplyr "%>%"
 get_summary_stats <- function(input_meta_df,logger) {
   meta_df=get_converged_metadfs(input_meta_df)
   if(ncol(input_meta_df)!=ncol(meta_df)){
@@ -97,9 +97,7 @@ get_summary_stats <- function(input_meta_df,logger) {
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @importFrom rlang .data 
-#' @importFrom magrittr "%>%"
-#' @examples
-#' clean_metaanalysis(metaanalysis,logger)
+#' @importFrom dplyr "%>%"
 clean_metaanalysis <- function(metaanalysis,logger) {
   meta_outputs <- tibble::as_tibble(metaanalysis)
   output <- get_summary_stats(meta_outputs,logger)

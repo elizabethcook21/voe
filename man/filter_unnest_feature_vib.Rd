@@ -14,8 +14,5 @@ filter_unnest_feature_vib(vib_df, logger)
 \description{
 Unnest regression output for vibrations.
 }
-\examples{
-filter_unnest_feature_vib(vib_df,logger)
-}
 \keyword{analysis}
 \keyword{voe}

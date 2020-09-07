@@ -22,8 +22,6 @@
 #' @importFrom rlang .data
 #' @keywords pipeline
 #' @export
-#' @examples
-#' full_voe_pipeline(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL)
 full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL){
   logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), log, log_file_path)
   output_to_return = list()

@@ -32,9 +32,6 @@ run_associations(
 \description{
 Function to run all associations for dependent and indepenent features.
 }
-\examples{
-run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger)
-}
 \keyword{assocatiation}
 \keyword{initial}
 \keyword{regression,}

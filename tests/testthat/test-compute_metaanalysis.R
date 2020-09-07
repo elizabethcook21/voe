@@ -1,5 +1,5 @@
 test_that("meta-analysis works", {
-	association_output = readRDS('../../data/sample_association_output.rds')
+	association_output = readRDS('sample_association_output.rds')
 	association_output2 = association_output
 	association_output2$dsid=2
     logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), FALSE, NULL)

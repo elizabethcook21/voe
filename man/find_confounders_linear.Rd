@@ -14,8 +14,5 @@ find_confounders_linear(voe_list_for_reg, logger)
 \description{
 Model confounding from vibration analysis.
 }
-\examples{
-find_confounders_linear(voe_list_for_reg, logger)
-}
 \keyword{analysis}
 \keyword{voe}

@@ -1,6 +1,6 @@
 test_that("linear regression works", {
-	metadata = readRDS('../../data/metadata_for_test.rds')
-	abundance = readRDS('../../data/abundance_data_for_test.rds') 
+	metadata = readRDS('metadata_for_test.rds')
+	abundance = readRDS('abundance_data_for_test.rds') 
 	abundance = abundance[,1:100]
 	bound_data = dplyr::tibble(dependent_variables=list(abundance),independent_variables=list(metadata),dsid=1)
 	logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), FALSE, NULL)
@@ -8,8 +8,8 @@ test_that("linear regression works", {
 })
 
 test_that("logistic regression works", {
-	metadata = readRDS('../../data/metadata_for_test.rds')
-	abundance = readRDS('../../data/abundance_data_for_test.rds') 
+	metadata = readRDS('metadata_for_test.rds')
+	abundance = readRDS('abundance_data_for_test.rds') 
 	abundance = abundance[,1:100]
 	logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), FALSE, NULL)
 	bound_data = dplyr::tibble(dependent_variables=list(abundance),independent_variables=list(metadata),dsid=1)

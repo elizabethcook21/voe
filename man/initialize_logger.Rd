@@ -6,13 +6,14 @@
 \usage{
 initialize_logger(fileName, saveLog = TRUE, logFilePath = NULL)
 }
+\arguments{
+\item{fileName}{Name of logfile}
+
+\item{saveLog}{TRUE/FALSE to save the logfile or not}
+
+\item{logFilePath}{if saveLog=TRUE, path to directory where logfile will be saved.}
+}
 \description{
 Initialize logging
-#' @param fileName
-#' @param saveLog 
-#' @param logFilePath
-}
-\examples{
-ind_var_analysis(metadata)
 }
 \keyword{logging}

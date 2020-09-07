@@ -14,7 +14,4 @@ get_summary_stats(input_meta_df, logger)
 \description{
 Remove failed meta-analyses.
 }
-\examples{
-get_summary_stats(input_meta_df,logger)
-}
 \keyword{meta-analysis}

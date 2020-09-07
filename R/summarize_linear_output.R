@@ -7,8 +7,6 @@
 #' @importFrom rlang .data
 #' @importFrom magrittr "%>%"
 #' @keywords voe analysis
-#' @examples
-#' filter_unnest_feature_vib(vib_df,logger)
 filter_unnest_feature_vib <- function(vib_df,logger) {
   return(vib_df %>% dplyr::slice(which(purrr::map_lgl(vib_df$feature_fit, ~class(.)[[1]] == "tbl_df"))) %>% tidyr::unnest(.data$feature_fit))
 }
@@ -22,8 +20,6 @@ filter_unnest_feature_vib <- function(vib_df,logger) {
 #' @importFrom rlang .data
 #' @importFrom magrittr "%>%"
 #' @keywords voe analysis
-#' @examples
-#' get_adjuster_expanded_vibrations(voe_df, adjusters,logger)
 get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
   copy_voe_df <- rlang::duplicate(voe_df, shallow = FALSE)
   adjusters= unique(unlist(unname(purrr::map(adjusters, function(x) unlist(x)))))
@@ -41,16 +37,14 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
 #' @param logger Logger object (default = NULL).
 #' @keywords voe analysis
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
-#' @examples
-#' find_confounders_linear(voe_list_for_reg, logger)
+#' @importFrom dplyr "%>%"
 find_confounders_linear <- function(voe_list_for_reg,logger){
   ptype=unique(voe_list_for_reg$term)
   voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(.data$full_fits,.data$std.error,.data$statistic))
   #voe_adjust_for_reg_ptype$estimate=abs(voe_adjust_for_reg_ptype$estimate)
   if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype) & !(1 %in% unique(unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature)))))){
     tryCatch({
-      fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,stats::as.formula(.data$estimate ~ . +(1|.data$independent_feature) -.data$independent_feature - .data$estimate - .data$p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
+      fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . +(1|independent_feature) -independent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
       fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate-.data$std.error),sdmax=(.data$estimate+.data$std.error))
       },
     error = function(e){
@@ -62,8 +56,8 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
   else{
     tryCatch({
       log4r::info(logger,'Note: Some features only had 1 vibration associated with them, likely due to a model failure or a paucity of vibration features. This means your confounder analysis will be done will a regular linear model, instead of a mixed effect one. See the documentation for more details.')
-      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(.data$estimate ~ . - .data$estimate - .data$p.value))
-      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate-.data$std.error),sdmax=(.data$estimate+.data$std.error))
+      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - p.value))
+      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
     },
     error = function(e){
       fit_estimate_forplot = 'Confounder analysis failed.'
@@ -81,10 +75,7 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
 #' @keywords voe analysis
 #' @importFrom rlang .data
 #' @importFrom magrittr "%>%"
-#' @examples
-#' summarize_vibration_data_by_feature(df, logger)
 summarize_vibration_data_by_feature <- function(df,logger){
-  print(df)
   p <- c(0.01,.5,.99)
   p_names <- purrr::map_chr(p, ~paste0('estimate_quantile_',.x*100, "%"))
   p_funs <- purrr::map(p, ~purrr::partial(quantile, probs = .x, na.rm = TRUE)) %>% purrr::set_names(nm = p_names)
@@ -106,13 +97,11 @@ summarize_vibration_data_by_feature <- function(df,logger){
 #' @param logger Logger object (default = NULL).
 #' @keywords voe analysis
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
+#' @importFrom dplyr "%>%"
 #' @export
-#' @examples
-#' analyze_voe_data(vibration_output,confounder_analysis,logger)
 analyze_voe_data <- function(vibration_output,confounder_analysis,logger){
   voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]],logger)
-  voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated,logger) %>% dplyr::select(-vars)
+  voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated,logger) %>% dplyr::select(-.data$vars)
   summarized = summarize_vibration_data_by_feature(voe_unnested_annotated,logger)
   c_analysis='No confounder analysis completed.'
   if(confounder_analysis==TRUE){

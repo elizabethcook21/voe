@@ -12,7 +12,4 @@ get_converged_metadfs(meta_df)
 \description{
 Remove failed meta-analyses.
 }
-\examples{
-get_converged_metadfs(meta_df)
-}
 \keyword{meta-analysis}

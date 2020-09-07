@@ -6,14 +6,15 @@
 \usage{
 makeBarGraph(table, columnName, pathToNewFolder)
 }
-\description{
-This function will create a Bar Graph for discrete data 
-#' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
-#' @param columnName The name of the column of which data will correspond to the x axis (the different bars of the graph)
-#' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+\arguments{
+\item{table}{A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.}
+
+\item{columnName}{The name of the column of which data will correspond to the x axis (the different bars of the graph)}
+
+\item{pathToNewFolder}{The path - a new folder - where the ggplot bar graph will be saved to}
 }
-\examples{
-makeBarGraph(ind_var, names(colTypes[i]),pathToNewFolder))
+\description{
+This function will create a Bar Graph for discrete data
 }
 \keyword{bar}
 \keyword{graph}

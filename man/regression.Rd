@@ -35,9 +35,6 @@ regression(
 \description{
 Run initial association for a single feature
 }
-\examples{
-regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger)
-}
 \keyword{assocatiation}
 \keyword{initial}
 \keyword{regression,}

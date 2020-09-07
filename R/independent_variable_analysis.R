@@ -1,15 +1,13 @@
 #' Analysis of Independent Variables
 #'
 #' This function will run the full pipeline
-#' #' @param independent_variables A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
-#' #' @param output_location  Folder where you want to save the output, default current working directory 
-#' #' @param log TRUE/FALSE, indicates if you want to use the logging feature.  
-#' #' @param log_file_path Path to where logfile will be saved (default = NULL). 
-#' #' @param output_location The path where you want to save all the ggplots and metadata
+#' @param independent_variables A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' @param output_location  Folder where you want to save the output, default current working directory 
+#' @param log TRUE/FALSE, indicates if you want to use the logging feature.  
+#' @param log_file_path Path to where logfile will be saved (default = NULL). 
+#' @param output_location The path where you want to save all the ggplots and metadata
 #' @keywords independent variable
 #' @export
-#' @examples
-#' ind_var_analysis(metadata)
 ind_var_analysis <- function(independent_variables, output_location = getwd(),log=FALSE,log_file_path=NULL){
   my_logger <- initialize_logger(paste0('ind_var_analysis_',format(Sys.time(), "%d-%b-%Y_%H.%M")),log,log_file_path)
 
@@ -44,12 +42,10 @@ ind_var_analysis <- function(independent_variables, output_location = getwd(),lo
 #' Making a Bar Graph
 #'
 #' This function will create a Bar Graph for discrete data 
-#' #' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
-#' #' @param columnName The name of the column of which data will correspond to the x axis (the different bars of the graph)
-#' #' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+#' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' @param columnName The name of the column of which data will correspond to the x axis (the different bars of the graph)
+#' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
 #' @keywords bar graph
-#' @examples
-#' makeBarGraph(ind_var, names(colTypes[i]),pathToNewFolder))
 makeBarGraph <- function(table, columnName,pathToNewFolder){
   ggplot2::ggplot(table, ggplot2::aes_string(x=columnName, fill = columnName)) +
     ggplot2::geom_bar() +
@@ -63,12 +59,10 @@ makeBarGraph <- function(table, columnName,pathToNewFolder){
 #' Making a Histogram
 #'
 #' This function will create a Bar Graph for discrete data 
-#' #' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
-#' #' @param columnName The name of the column of which data will correspond to the x axis 
-#' #' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
+#' @param table A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.
+#' @param columnName The name of the column of which data will correspond to the x axis 
+#' @param pathToNewFolder The path - a new folder - where the ggplot bar graph will be saved to
 #' @keywords histogram
-#' @examples
-#' makeHistogram(histogram_tibble, names(colTypes[i]),pathToNewFolder)
 makeHistogram <- function(table, columnName,pathToNewFolder){
   ggplot2::ggplot(table, ggplot2::aes_string(x=columnName)) +
     ggplot2::geom_histogram() +

@@ -32,9 +32,6 @@ compute_initial_associations(
 \description{
 Top-level function to run all associations for all datasets.
 }
-\examples{
-compute_initial_associations(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger)
-}
 \keyword{assocatiation}
 \keyword{initial}
 \keyword{regression,}

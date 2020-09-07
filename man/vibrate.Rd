@@ -44,9 +44,6 @@ vibrate(
 \description{
 Run vibrations for a single feature
 }
-\examples{
-vibrate(merged_data,variables_to_vibrate,max_vars_in_model,feature,primary_variable,model_type,regression_weights,max_vibration_num,dataset_id,proportion_cutoff,logger)
-}
 \keyword{assocatiation}
 \keyword{initial}
 \keyword{regression,}

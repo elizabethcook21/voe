@@ -24,6 +24,8 @@ compute_vibrations(
 
 \item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
 
+\item{features_of_interest}{Feature to vibrate over.}
+
 \item{max_vibration_num}{Maximum number of vibrations (default=50000).}
 
 \item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done).}
@@ -35,18 +37,9 @@ compute_vibrations(
 \item{logger}{Logger object (default = NULL).}
 
 \item{max_vars_in_model}{Maximum number of variables allowed in in a model.}
-
-\item{variables_to_vibrate}{Variables over which you're going to vibrate.}
-
-\item{feature}{Feature over which to vibrate.}
-
-\item{dataset_id}{Identifier for dataset.}
 }
 \description{
 Run vibrations for all features for all datasets
-}
-\examples{
-compute_vibrations(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
 }
 \keyword{assocatiation}
 \keyword{initial}

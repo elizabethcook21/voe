@@ -14,8 +14,5 @@ summarize_vibration_data_by_feature(df, logger)
 \description{
 Summarize output of vibrations for each dependent feature of interest.
 }
-\examples{
-summarize_vibration_data_by_feature(df, logger)
-}
 \keyword{analysis}
 \keyword{voe}

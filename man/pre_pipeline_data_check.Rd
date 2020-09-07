@@ -40,13 +40,8 @@ pre_pipeline_data_check(
 \item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
 
 \item{logger}{Logger object (default = NULL).}
-
-\item{vibrate}{TRUE/FALSE -- run vibrations (default=TRUE)}
 }
 \description{
 Check datasets and print pre-run statistics prior to deployment.
-}
-\examples{
-pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger)
 }
 \keyword{pipeline}

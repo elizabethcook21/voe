@@ -16,8 +16,5 @@ analyze_voe_data(vibration_output, confounder_analysis, logger)
 \description{
 Post-process vibration output.
 }
-\examples{
-analyze_voe_data(vibration_output,confounder_analysis,logger)
-}
 \keyword{analysis}
 \keyword{voe}

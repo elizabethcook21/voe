@@ -1,12 +1,10 @@
 #' Logger
 #'
 #' Initialize logging
-#' #' @param fileName Name of logfile
-#' #' @param saveLog TRUE/FALSE to save the logfile or not
-#' #' @param logFilePath if saveLog=TRUE, path to directory where logfile will be saved.
+#' @param fileName Name of logfile
+#' @param saveLog TRUE/FALSE to save the logfile or not
+#' @param logFilePath if saveLog=TRUE, path to directory where logfile will be saved.
 #' @keywords logging
-#' @examples
-#' ind_var_analysis(metadata)
 initialize_logger <- function(fileName, saveLog = TRUE, logFilePath = NULL){
 
   if(saveLog == TRUE){

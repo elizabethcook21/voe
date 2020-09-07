@@ -5,7 +5,6 @@
 #' @param dependent_variables A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).
 #' @param independent_variables A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent_variables tibble.
 #' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
-#' @param vibrate TRUE/FALSE -- run vibrations (default=TRUE)
 #' @param max_vars_in_model Maximum number of variables allowed in a single fit (for vibrations). (default=NULL)
 #' @param fdr_method Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni.
 #' @param fdr_cutoff Cutoff for an FDR significant association (default = 0.05).
@@ -17,8 +16,6 @@
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
 #' @keywords pipeline
-#' @examples
-#' pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger)
 pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger){
   log4r::info(logger,'Checking input data...')
   if(meta_analysis==TRUE){

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1598323948637.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "55171403",
+    "lastKnownWriteTime" : 1598385494,
+    "last_content_update" : 1598385494026,
+    "path" : "~/GitHub/voe/R/voe_pipeline.R",
+    "project_path" : "R/voe_pipeline.R",
+    "properties" : {
+        "cursorPosition" : "21,21",
+        "scrollLine" : "6"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

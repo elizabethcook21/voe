@@ -16,8 +16,5 @@ get_adjuster_expanded_vibrations(voe_df, adjusters, logger)
 \description{
 Add column to vibration output for each adjuster (indicating presence or absence in a model).
 }
-\examples{
-get_adjuster_expanded_vibrations(voe_df, adjusters,logger)
-}
 \keyword{analysis}
 \keyword{voe}

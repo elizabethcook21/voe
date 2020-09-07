@@ -14,7 +14,4 @@ compute_metaanalysis(df, logger)
 \description{
 Run meta-analysis for each feature
 }
-\examples{
-compute_metaanalysis(df,logger)
-}
 \keyword{meta-analysis}

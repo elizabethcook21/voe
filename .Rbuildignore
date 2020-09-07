@@ -1,0 +1,7 @@
+^\./\.git$
+^\./manuscript$
+^\.DS_Store$
+^\.Rhistory$
+^\.Rproj\.user$
+^\./voe_command_line_deployment\.R$
+^LICENSE\.md$

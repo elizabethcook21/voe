@@ -34,7 +34,6 @@ compute_metaanalysis <- function(df,logger) {
     c=df_sub$dataset_id
     meta_analysis_output <- tibble::tibble(meta_analysis_command(a,b,c)) 
     ma_output_all[[new_colname]] = meta_analysis_output
-    print(meta_analysis_output[[1]])
   }
   ma_output_all_df= ma_output_all %>% dplyr::bind_cols()
   colnames(ma_output_all_df) = names(ma_output_all)

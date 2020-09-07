@@ -27,6 +27,17 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
       varset=sample(varset,as.numeric(max_vibration_num))
     }
     regression_df = merged_data %>% dplyr::select(c(dplyr::all_of(feature),dplyr::all_of(primary_variable),dplyr::all_of(regression_weights),dplyr::all_of(variables_to_vibrate)))
+    if(model_type=='negative_binomial'){
+      return(tibble::tibble(
+      independent_feature = feature,
+      dataset_id = dataset_id,
+      vars = varset,
+      full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(MASS::glm.nb(formula=stats::as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),weights=regression_df %>% dplyr::select(regression_weights) %>% unlist %>% unname,data = regression_df)),warning = function(w) w, error = function(e) e)),
+      feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
+      )
+    ))
+    }
+    else{
       return(tibble::tibble(
       independent_feature = feature,
       dataset_id = dataset_id,
@@ -35,6 +46,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
       feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
       )
     ))
+    }
 }
 
 #' Vibration for dataset

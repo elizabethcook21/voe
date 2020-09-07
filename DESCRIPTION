@@ -20,6 +20,7 @@ Imports:
     purrr,
     tidyr,
     magrittr,
+    MASS,
     stringr,
     rlang,
     meta,

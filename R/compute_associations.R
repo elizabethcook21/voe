@@ -18,10 +18,18 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
   regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),c(feature_name)),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
   regression_df = regression_df %>% dplyr::select(-.data$sampleID)
   #run regression
+  if(model_type=='negative_binomial'){
+    return(tryCatch(broom::tidy(MASS::glm.nb(formula=stats::as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),weights=regression_df %>% dplyr::select(regression_weights) %>% unlist %>% unname,data = regression_df)) %>% dplyr::mutate(feature=feature_name),
+             warning = function(w) w, # if warning or error, just return them instead of output
+             error = function(e) e
+    ))
+  }
+  else{
     return(tryCatch(broom::tidy(stats::glm(formula=stats::as.formula(stringr::str_c("I(`", feature_name,"`) ~ ",primary_variable)),family=model_type,weights=regression_df %>% dplyr::select(regression_weights) %>% unlist %>% unname,data = regression_df)) %>% dplyr::mutate(feature=feature_name),
              warning = function(w) w, # if warning or error, just return them instead of output
              error = function(e) e
     ))
+  }
 }
 
 

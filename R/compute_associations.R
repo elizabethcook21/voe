@@ -11,7 +11,7 @@
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
+#' @importFrom dplyr "%>%"
 #' @keywords regression, initial assocatiation
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
   feature_name = colnames(dependent_variables)[j+1]
@@ -44,7 +44,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
+#' @importFrom dplyr "%>%"
 #' @keywords regression, initial assocatiation
 run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger){
   dependent_variables <- dplyr::as_tibble(x[[1]])
@@ -102,11 +102,11 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
-#' @importFrom magrittr "%>%"
+#' @importFrom dplyr "%>%"
 #' @keywords regression, initial assocatiation
 #' @export
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger){
-    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights, logger))
+    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger))
     output_regs = purrr::map(output, function(x) x[[1]])
     output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))
     if(FALSE %in% output_vib & vibrate!=FALSE){

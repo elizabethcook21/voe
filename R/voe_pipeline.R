@@ -18,7 +18,7 @@
 #' @param confounder_analysis Run mixed effect confounder analysis (default=TRUE).
 #' @param log TRUE/FALSE. Save output to log file.
 #' @param log_file_path Location where you would like logfile to be saved if log==TRUE (default=NULL).
-#' @importFrom magrittr "%>%"
+#' @importFrom dplyr "%>%"
 #' @importFrom rlang .data
 #' @keywords pipeline
 #' @export
@@ -36,11 +36,11 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     bound_data = dplyr::tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
-  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger)#, mtry, num.trees, importance,min.node.size,splitrule)
+  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type,logger)#, mtry, num.trees, importance,min.node.size,splitrule)
   if(passed==TRUE){
     Sys.sleep(2)
     log4r::info(logger,'Deploying initial associations...')
-    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger)
+    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, regression_weights, logger)
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
     association_output=association_output_full[['output']]

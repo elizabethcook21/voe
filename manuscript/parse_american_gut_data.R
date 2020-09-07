@@ -9,7 +9,6 @@ baz = as.data.frame(t(foobar))
 baz = baz %>% rownames_to_column('sampleID')
 samples = baz %>% select(sampleID)
 baz=baz %>% select(-sampleID)
-baz=log(baz + 1)
 baz = bind_cols(samples,baz)
 saveRDS(baz,'ag_fecal_tibble_data_10k.rds')
 

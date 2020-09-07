@@ -14,8 +14,7 @@ vibrate(
   regression_weights,
   max_vibration_num,
   dataset_id,
-  proportion_cutoff,
-  logger
+  proportion_cutoff
 )
 }
 \arguments{
@@ -38,8 +37,6 @@ vibrate(
 \item{dataset_id}{Identifier for dataset.}
 
 \item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)}
-
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Run vibrations for a single feature

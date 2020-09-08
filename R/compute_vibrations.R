@@ -47,7 +47,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
         feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
         )
       ))
-  }
+    }
 }
 
 #' Vibration for dataset

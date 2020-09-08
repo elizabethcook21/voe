@@ -1,6 +1,7 @@
 ^\./\.git$
-^\./manuscript$
 ^\.DS_Store$
+^\./manuscript$
+^\./IGT$
 ^\.Rhistory$
 ^\.Rproj\.user$
 ^\./voe_command_line_deployment\.R$

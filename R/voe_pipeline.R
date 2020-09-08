@@ -28,6 +28,8 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   if(inherits(dependent_variables, "list")==TRUE){
     log4r::info(logger,'Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
+    dataset_num = nrow(bound_data)
+    print(dataset_num)
     if(meta_analysis==FALSE){
       return(log4r::info(logger,'The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
     }
@@ -46,7 +48,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     association_output=association_output_full[['output']]
     if(meta_analysis == TRUE){
       metaanalysis <- compute_metaanalysis(association_output,logger)
-      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis,logger)
+      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis,dataset_num,logger)
       output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
       features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(.data$feature)
     }

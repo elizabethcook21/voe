@@ -7,8 +7,8 @@
 #' @keywords meta-analysis
 #' @export
 #' @importFrom dplyr %>%
-meta_analysis_command <- function(a,b,c){
-return(list(tryCatch(meta::metagen(TE = a,seTE = b, studlab = c,comb.fixed = FALSE, comb.random = TRUE, method.tau = 'REML', hakn = FALSE, prediction = TRUE,sm = "SMD",control=list(maxiter=1000)),  warning = function(w) w, error = function(e) e)))
+meta_analysis_command <- function(a,b,c,d){
+return(d = list(tryCatch(meta::metagen(TE = a,seTE = b, studlab = c,comb.fixed = FALSE, comb.random = TRUE, method.tau = 'REML', hakn = FALSE, prediction = TRUE,sm = "SMD",control=list(maxiter=1000)),  warning = function(w) w, error = function(e) e)))
 }
 
 #' Run meta-analysis
@@ -32,12 +32,13 @@ compute_metaanalysis <- function(df,logger) {
     a=df_sub$estimate
     b=df_sub$std.error
     c=df_sub$dataset_id
-    meta_analysis_output <- tibble::tibble(meta_analysis_command(a,b,c)) 
+    meta_analysis_output <- tibble::tibble(meta_analysis_command(a,b,c,new_colname))
+    colnames(meta_analysis_output) = new_colname
     ma_output_all[[new_colname]] = meta_analysis_output
   }
   ma_output_all_df= ma_output_all %>% dplyr::bind_cols()
-  colnames(ma_output_all_df) = names(ma_output_all)
-  return(ma_output_all_df) # remove placeholder column
+  saveRDS(ma_output_all_df,'foo.rds')
+  return(ma_output_all_df) 
 }
 
 #' Filter-meta analysis
@@ -47,11 +48,17 @@ compute_metaanalysis <- function(df,logger) {
 #' @keywords meta-analysis
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
-get_converged_metadfs <- function(meta_df) {
+get_converged_metadfs <- function(meta_df,dataset_num) {
   toremove=list()
   count=0
+  saveRDS(meta_df,'foo4.rds')
   for(x in 1:length(meta_df)){
     if(class(meta_df[[x]][[1]])[[1]]!='metagen'){
+      toremove[as.character(count)]=x
+      count=count+1
+      next
+    }
+    if(nrow(meta_df[[x]][[1]][['data']])!=dataset_num){
       toremove[as.character(count)]=x
       count=count+1
     }
@@ -70,10 +77,10 @@ get_converged_metadfs <- function(meta_df) {
 #' @keywords meta-analysis
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
-get_summary_stats <- function(input_meta_df,logger) {
-  meta_df=get_converged_metadfs(input_meta_df)
+get_summary_stats <- function(input_meta_df,dataset_num,logger) {
+  meta_df=get_converged_metadfs(input_meta_df,dataset_num)
   if(ncol(input_meta_df)!=ncol(meta_df)){
-    log4r::info(logger,paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features. These will be dropped from your output dataframe.'))
+    log4r::info(logger,paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features or they were found in only 1 dataset. These will be dropped from your output dataframe.'))
   }
   return(
     tibble::tibble(
@@ -97,8 +104,8 @@ get_summary_stats <- function(input_meta_df,logger) {
 #' @keywords meta-analysis
 #' @importFrom rlang .data 
 #' @importFrom dplyr "%>%"
-clean_metaanalysis <- function(metaanalysis,logger) {
+clean_metaanalysis <- function(metaanalysis,dataset_num,logger) {
   meta_outputs <- tibble::as_tibble(metaanalysis)
-  output <- get_summary_stats(meta_outputs,logger)
+  output <- get_summary_stats(meta_outputs,dataset_num,logger)
   return(output)
 }

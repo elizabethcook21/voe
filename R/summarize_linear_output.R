@@ -40,8 +40,7 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
 #' @importFrom dplyr "%>%"
 find_confounders_linear <- function(voe_list_for_reg,logger){
   ptype=unique(voe_list_for_reg$term)
-  voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(.data$full_fits,.data$std.error,.data$statistic))
-  #voe_adjust_for_reg_ptype$estimate=abs(voe_adjust_for_reg_ptype$estimate)
+  voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select(-.data$dataset_id) %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(.data$full_fits,.data$std.error,.data$statistic))
   if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype) & !(1 %in% unique(unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature)))))){
     tryCatch({
       fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . +(1|independent_feature) -independent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))

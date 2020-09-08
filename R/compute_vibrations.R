@@ -20,6 +20,9 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
         random_list = sample.int(max_vars_in_model,max_vibration_num,replace=TRUE)
         varset = purrr::map(random_list, function(x) sample(variables_to_vibrate,x))
       }
+      else{
+        varset=rje::powerSet(variables_to_vibrate)        
+      }
     }
     else{
       varset=rje::powerSet(variables_to_vibrate)

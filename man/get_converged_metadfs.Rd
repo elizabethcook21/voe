@@ -4,10 +4,12 @@
 \alias{get_converged_metadfs}
 \title{Filter-meta analysis}
 \usage{
-get_converged_metadfs(meta_df)
+get_converged_metadfs(meta_df, dataset_num)
 }
 \arguments{
 \item{meta_df}{Meta-analysis output.}
+
+\item{dataset_num}{Number of datasets.}
 }
 \description{
 Remove failed meta-analyses.

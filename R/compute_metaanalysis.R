@@ -1,14 +1,15 @@
 #' Meta-analysis function
 #'
 #' metagen function
-#' @param a estimates
-#' @param b standard errors
-#' @param c study labels
+#' @param te estimates
+#' @param sete standard errors
+#' @param studlab study labels
+#' @param name study labels
 #' @keywords meta-analysis
 #' @export
 #' @importFrom dplyr %>%
-meta_analysis_command <- function(a,b,c,d){
-return(d = list(tryCatch(meta::metagen(TE = a,seTE = b, studlab = c,comb.fixed = FALSE, comb.random = TRUE, method.tau = 'REML', hakn = FALSE, prediction = TRUE,sm = "SMD",control=list(maxiter=1000)),  warning = function(w) w, error = function(e) e)))
+meta_analysis_command <- function(te,sete,studlab,name){
+return(name = list(tryCatch(meta::metagen(TE = te,seTE = sete, studlab = studlab,comb.fixed = FALSE, comb.random = TRUE, method.tau = 'REML', hakn = FALSE, prediction = TRUE,sm = "SMD",control=list(maxiter=1000)),  warning = function(w) w, error = function(e) e)))
 }
 
 #' Run meta-analysis
@@ -37,7 +38,6 @@ compute_metaanalysis <- function(df,logger) {
     ma_output_all[[new_colname]] = meta_analysis_output
   }
   ma_output_all_df= ma_output_all %>% dplyr::bind_cols()
-  saveRDS(ma_output_all_df,'foo.rds')
   return(ma_output_all_df) 
 }
 
@@ -45,13 +45,13 @@ compute_metaanalysis <- function(df,logger) {
 #'
 #' Remove failed meta-analyses.
 #' @param meta_df Meta-analysis output.
+#' @param dataset_num Number of datasets.
 #' @keywords meta-analysis
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
 get_converged_metadfs <- function(meta_df,dataset_num) {
   toremove=list()
   count=0
-  saveRDS(meta_df,'foo4.rds')
   for(x in 1:length(meta_df)){
     if(class(meta_df[[x]][[1]])[[1]]!='metagen'){
       toremove[as.character(count)]=x
@@ -73,6 +73,7 @@ get_converged_metadfs <- function(meta_df,dataset_num) {
 #'
 #' Remove failed meta-analyses.
 #' @param input_meta_df Meta-analysis output.
+#' @param dataset_num Number of datasets.
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @importFrom rlang .data
@@ -100,6 +101,7 @@ get_summary_stats <- function(input_meta_df,dataset_num,logger) {
 #'
 #' Export meta-analysis.
 #' @param metaanalysis Meta-analysis output.
+#' @param dataset_num Number of datasets.
 #' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @importFrom rlang .data 

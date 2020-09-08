@@ -4,14 +4,16 @@
 \alias{meta_analysis_command}
 \title{Meta-analysis function}
 \usage{
-meta_analysis_command(a, b, c)
+meta_analysis_command(te, sete, studlab, name)
 }
 \arguments{
-\item{a}{estimates}
+\item{te}{estimates}
 
-\item{b}{standard errors}
+\item{sete}{standard errors}
 
-\item{c}{study labels}
+\item{studlab}{study labels}
+
+\item{name}{study labels}
 }
 \description{
 metagen function

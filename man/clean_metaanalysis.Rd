@@ -4,10 +4,12 @@
 \alias{clean_metaanalysis}
 \title{Clean meta-analysis output and get summary statistics.}
 \usage{
-clean_metaanalysis(metaanalysis, logger)
+clean_metaanalysis(metaanalysis, dataset_num, logger)
 }
 \arguments{
 \item{metaanalysis}{Meta-analysis output.}
+
+\item{dataset_num}{Number of datasets.}
 
 \item{logger}{Logger object (default = NULL).}
 }

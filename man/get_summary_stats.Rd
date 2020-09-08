@@ -4,10 +4,12 @@
 \alias{get_summary_stats}
 \title{Extract meta-analysis summary statistics}
 \usage{
-get_summary_stats(input_meta_df, logger)
+get_summary_stats(input_meta_df, dataset_num, logger)
 }
 \arguments{
 \item{input_meta_df}{Meta-analysis output.}
+
+\item{dataset_num}{Number of datasets.}
 
 \item{logger}{Logger object (default = NULL).}
 }

@@ -29,7 +29,6 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     log4r::info(logger,'Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
     dataset_num = nrow(bound_data)
-    print(dataset_num)
     if(meta_analysis==FALSE){
       return(log4r::info(logger,'The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
     }

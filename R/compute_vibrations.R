@@ -15,9 +15,11 @@
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,primary_variable,model_type,regression_weights,max_vibration_num,dataset_id,proportion_cutoff){
-    if(is.null(max_vars_in_model)==FALSE & max_vars_in_model < length(variables_to_vibrate)){
-      random_list = sample.int(max_vars_in_model,max_vibration_num,replace=TRUE)
-      varset = purrr::map(random_list, function(x) sample(variables_to_vibrate,x))
+    if(is.null(max_vars_in_model)==FALSE){
+      if(max_vars_in_model < length(variables_to_vibrate)){
+        random_list = sample.int(max_vars_in_model,max_vibration_num,replace=TRUE)
+        varset = purrr::map(random_list, function(x) sample(variables_to_vibrate,x))
+      }
     }
     else{
       varset=rje::powerSet(variables_to_vibrate)
@@ -45,7 +47,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
         feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
         )
       ))
-    }
+  }
 }
 
 #' Vibration for dataset

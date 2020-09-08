@@ -81,7 +81,7 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
     in_sub=in_sub %>% dplyr::select(-dplyr::all_of(todrop))
   }
   dep_sub = dep_sub %>% dplyr::select(.data$sampleID,c(features_of_interest))
-  variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,dplyr::all_of(regression_weights),dplyr::all_of(primary_variable))))
+  variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,.data$dataset_id,dplyr::all_of(regression_weights),dplyr::all_of(primary_variable))))
   merged_data=dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub %>% dplyr::mutate_if(is.factor, as.character),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
   if(as.integer(cores)>1){
     options(future.globals.maxSize = +Inf)

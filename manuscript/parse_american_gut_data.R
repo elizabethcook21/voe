@@ -12,7 +12,7 @@ baz=baz %>% select(-sampleID)
 baz = bind_cols(samples,baz)
 saveRDS(baz,'ag_fecal_tibble_data_10k.rds')
 
-metadata=read.csv('ag_10k_fecal.txt',sep='\t') %>% select(-SURVEY_ID,)
+metadata=read.csv('ag_10k_fecal.txt',sep='\t') %>% select(-SURVEY_ID)
 
 metadata[metadata=='Unknown']=NA
 metadata[metadata=='no_data']=NA

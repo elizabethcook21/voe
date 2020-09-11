@@ -9,6 +9,8 @@ baz = as.data.frame(t(foobar))
 baz = baz %>% rownames_to_column('sampleID')
 samples = baz %>% select(sampleID)
 baz=baz %>% select(-sampleID)
+toremove = which(colSums(baz==0)/nrow(baz)>=.9)
+baz=baz %>% select(-all_of(toremove))
 baz = bind_cols(samples,baz)
 saveRDS(baz,'ag_fecal_tibble_data_10k.rds')
 
@@ -28,6 +30,7 @@ metadata[metadata=='Not Sure']=NA
 colnames(metadata)[1]='sampleID'
 
 metadata = metadata[!is.na(metadata$BMI_CORRECTED),]
+metadata = metadata[!is.na(metadata$EXERCISE_FREQUENCY),]
 
 toremove = which(colSums(is.na(metadata %>% dplyr::select(-sampleID)))/nrow(metadata)>=.5)
 metadata= metadata %>% select(-c(names(toremove)))

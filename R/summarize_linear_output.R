@@ -52,6 +52,16 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
       trylinear=TRUE
     })
   }
+  if(trylinear==TRUE){
+    tryCatch({
+      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - p.value))
+      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
+    },
+    error = function(e){
+      fit_estimate_forplot = 'Confounder analysis failed.'
+      log4r::info(logger,'Confounder analysis failed despite multiple attempts. We recommend looking at the raw vibration output to see what the issue may be.')
+    })
+  }
   else{
     tryCatch({
       log4r::info(logger,'Note: Some features only had 1 vibration associated with them, likely due to a model failure or a paucity of vibration features. This means your confounder analysis will be done will a regular linear model, instead of a mixed effect one. See the documentation for more details.')
@@ -61,16 +71,6 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
     error = function(e){
       fit_estimate_forplot = 'Confounder analysis failed.'
       log4r::info(logger,'Confounder analysis failed. We recommend looking at the raw vibration output to see what the issue may be.')
-    })
-  }
-  if(trylinear==TRUE){
-    tryCatch({
-      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - p.value))
-      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
-    },
-    error = function(e){
-      fit_estimate_forplot = 'Confounder analysis failed.'
-      log4r::info(logger,'Confounder analysis failed despite multiple attempts. We recommend looking at the raw vibration output to see what the issue may be.')
     })
   }
   return(fit_estimate_forplot)

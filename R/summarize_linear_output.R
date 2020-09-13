@@ -39,6 +39,7 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters,logger) {
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
 find_confounders_linear <- function(voe_list_for_reg,logger){
+  trylinear=FALSE
   ptype=unique(voe_list_for_reg$term)
   voe_adjust_for_reg_ptype <- voe_list_for_reg %>% dplyr::select(-.data$dataset_id) %>% dplyr::select_if(~ length(unique(.)) > 1) %>% dplyr::select(-c(.data$full_fits,.data$std.error,.data$statistic))
   if('independent_feature' %in% colnames(voe_adjust_for_reg_ptype) & !(1 %in% unique(unlist(unname(table(voe_adjust_for_reg_ptype$independent_feature)))))){
@@ -47,14 +48,23 @@ find_confounders_linear <- function(voe_list_for_reg,logger){
       fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate-.data$std.error),sdmax=(.data$estimate+.data$std.error))
       },
     error = function(e){
-      fit_estimate_forplot = 'Confounder analysis failed.'
-      print(fit_estimate_forplot)
       log4r::info(logger,'Note: Mixed effect modeling to identify sources of confounding failed. Running a simple linear model instead. If you want to try this analysis yourself, you can access the raw data for this yourself in the output and follow the methodological layout in the docs.')
+      trylinear=TRUE
     })
   }
   else{
     tryCatch({
       log4r::info(logger,'Note: Some features only had 1 vibration associated with them, likely due to a model failure or a paucity of vibration features. This means your confounder analysis will be done will a regular linear model, instead of a mixed effect one. See the documentation for more details.')
+      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - p.value))
+      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
+    },
+    error = function(e){
+      fit_estimate_forplot = 'Confounder analysis failed.'
+      log4r::info(logger,'Confounder analysis failed. We recommend looking at the raw vibration output to see what the issue may be.')
+    })
+  }
+  if(trylinear==TRUE){
+    tryCatch({
       fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - p.value))
       fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
     },

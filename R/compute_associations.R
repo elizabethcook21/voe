@@ -15,7 +15,7 @@
 #' @keywords regression, initial assocatiation
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
   feature_name = colnames(dependent_variables)[j+1]
-  regression_df=dplyr::left_join(independent_variables %>% dplyr::mutate_if(is.factor, as.character), dependent_variables %>% dplyr::select(c(1),c(feature_name)),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
+  regression_df=dplyr::left_join(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)),independent_variables %>% dplyr::mutate_if(is.factor, as.character),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
   regression_df = regression_df %>% dplyr::select(-.data$sampleID)
   #run regression
   if(model_type=='negative_binomial'){

@@ -10,44 +10,147 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(ggplot2)
 library(tidyverse)
+library(lubridate)
 library(RColorBrewer)
+library(cowplot)
+library(broom)
+library(reshape2)
+library(lme4)
+library(broom.mixed)
+library(lmerTest)
+library(pheatmap)
+theme_set(theme_cowplot())
 ```
 
 ```{r}
-#NHANES
+#benchmarking
 setwd('~/GitHub/voe/manuscript/')
 
-load('nhanes9904_VoE.Rdata')
+benchmarkdata = read.csv('jobtimedata.csv',header=F,sep='\t')
+benchmarkdata$elapsed_time = as.numeric(gsub('S','',lubridate::seconds(hms(benchmarkdata$V3))))
+benchmarkdata$jobsize = as.numeric(gsub('K','',benchmarkdata$V4))/1000000
 
-nhanes_data = readRDS('nhanes_voe.rds')
+benchmarkdata = benchmarkdata %>% select(V6,V7,jobsize,elapsed_time) %>% arrange(V7)
 
-vibration_output = nhanes_data$vibration_output
-confounder_analysis = vibration_output$confounder_analysis
-confounder_analysis = left_join(confounder_analysis,dictionary %>% select(varname,variable_description),by=c('term'='varname')) %>% filter(!is.na(variable_description))
-vibration_data = vibration_output$data
+ggplot(data=benchmarkdata,aes(x=log(V6),y=log(elapsed_time),color=V7)) + geom_point() + ggtitle('Runtime benchmarking') + xlab('log(Number of vibrations)') + ylab('Log(Seconds)')
+ggsave('figures/jobtimes.pdf',width=7,height=5)
+ggplot(data=benchmarkdata,aes(x=log(V6),y=log(jobsize),color=V7)) + geom_point()+ ggtitle('Memory usage')+ xlab('log(Number of vibrations)') + ylab('Log(RAM used, GB)')
+ggsave('figures/memusage.pdf',width=7,height=5)
 
-ggplot(data = vibration_data, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=50)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-2.2,2.2) + theme(legend.text=element_text(size=6))+ggtitle('Vibration of effects between dietary fiber intake and BMI')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) 
-ggsave('bmi_fiber.pdf',width=6,height=6)
+```
+```{r}
+#confounder benchmark
+setwd('~/GitHub/voe/manuscript/')
 
-top_confounder_analysis = confounder_analysis %>% filter(p.value<0.05) %>% arrange(desc(estimate)) %>% head(25)
-bottom_confounder_analysis = confounder_analysis%>% filter(p.value<0.05) %>% arrange(desc(estimate)) %>% tail(25)
+phenotypes = unique(benchmarkdata$V7)
 
-ggplot(data = top_confounder_analysis,aes(x=reorder(variable_description,(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+geom_errorbar(aes(ymin =sdmin,ymax=sdmax,width=.9))
-ggsave('inflating_confounder_analysis.pdf',width=6,height=6)
-ggplot(data = bottom_confounder_analysis,aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+geom_errorbar(aes(ymin =sdmin,ymax=sdmax,width=.9))
-ggsave('defflating_confounder_analysis.pdf',width=6,height=6)
+files=list.files()[grep('_pa_',list.files())]
 
-vibration_data_sub1 = vibration_data %>% filter(LBXVID==1) %>% select(estimate,p.value) %>% mutate(var='waist')
-vibration_data_sub2 = vibration_data %>% filter(LBXCOT==1) %>% select(estimate,p.value) %>% mutate(var='cotinine')
-vibration_data_sub = bind_rows(vibration_data_sub1,vibration_data_sub2)
-ggplot(data = vibration_data_sub, aes(x = estimate, y = -log10(p.value),color=as.factor(var))) +geom_point(alpha=.5)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-2.2,2.2) + theme(legend.text=element_text(size=6))+ggtitle('Vibration of effects between dietary fiber intake and BMI')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) 
-#ggsave('potassium_dpd.png',width=6,height=6)
+breaksList = seq(.85, 1.0, by = .01)
+
+all_vibration_data=list()
+confounder_presence_data = list()
+for(p in phenotypes){
+  files_sub = files[grep(p,files)]
+  confounder_analysis_list = list()
+  for(f in files_sub){
+    data = readRDS(f)
+    name = strsplit(f,'_')[[1]][4]
+    vibration_output=data$vibration_output
+    all_vibration_data[[p]]=vibration_output
+    confounder_analysis=vibration_output$confounder_analysis %>% select(term,estimate)
+    colnames(confounder_analysis)[2] = name
+    confounder_analysis_list[[name]]=confounder_analysis
+    totalobs = unlist(unname(vibration_output$data[9:ncol(vibration_output$data)] %>% colSums))
+    confounder_presence_data[[f]]=c(totalobs)
+  }
+  confounder_analysis_list = confounder_analysis_list %>% reduce(inner_join, by = "term") %>% select(-term)
+  pdf(paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'.pdf',sep=''),width=3,height=3)
+  pheatmap(cor(confounder_analysis_list),cluster_rows=FALSE,cluster_cols=FALSE,breaks=breaksList)
+  dev.off()
+}
+
+num_obs_pe_var = do.call('rbind',confounder_presence_data)  %>% melt %>% mutate(num=strsplit(as.character(Var1),'_') %>% map_chr(4)) %>% select(-Var1,-Var2) %>% group_by(num) %>% summarize(mean=mean(value),sd=sd(value))
+write.csv(num_obs_pe_var,'figures/num_obs_per_var.csv')
 
 ```
 
-```{r}
-#nhanes rulefit
 
-pre::pre()
+```{r}
+#volcano plots
+load('nhanes9904_VoE.Rdata')
+
+get_confounders <- function(vibration_data,dictionary,name){
+  #regout  = cv.glmnet(y=vibration_data_i %>% select(estimate) %>% as.matrix, x=vibration_data_i %>% select(-estimate) %>% as.matrix, alpha=1 ,type.measure = "mse", nfolds = 10)
+  vibration_data_for_reg = vibration_data %>% select(-c(std.error,statistic, p.value,independent_feature))
+  regout = broom.mixed::tidy(lmer(estimate ~ . + (1|term),data=vibration_data_for_reg))
+  regout = regout %>% filter(term!='(Intercept)',effect=='fixed') %>% select(-group,-effect)
+# coefficients = as.data.frame(as.matrix(coef(regout))) %>% rownames_to_column('term') %>% arrange(1)
+  coefficients = left_join(regout,dictionary %>% select(varname,variable_description),by=c('term'='varname')) %>% filter(!is.na(variable_description)) %>% filter(p.value<0.05) %>% select(variable_description,term,estimate,std.error) 
+  bot_confounder_analysis = coefficients %>% arrange(estimate) %>% distinct %>% head(10)
+  top_confounder_analysis = coefficients %>% arrange(desc(estimate)) %>% distinct%>% head(10)
+  tbca = bind_rows(top_confounder_analysis,bot_confounder_analysis)
+  ggplot(data = tbca %>% select(-term),aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + coord_flip()+xlab('') + ylab('Average change in effect size')
+  ggsave(paste('figures/',name,'_confounder_analysis.pdf',sep=''))
+  
+  topconf = as.character(top_confounder_analysis$term[1])
+  botconf = as.character(bot_confounder_analysis$term[1])
+  vibration_data_sub1 = vibration_data %>% select(colnames(vibration_data[,topconf]),estimate,p.value)%>% mutate(var=colnames(vibration_data[,topconf]))
+  max_x_val = max(abs(vibration_data_sub1 %>% select(estimate) %>% range))+.001
+  ggplot(data = vibration_data_sub1, aes(x = estimate, color=factor(get(topconf),levels=c(1,0)), y = -log10(p.value))) +geom_point(alpha=.2,shape=21,size=.3,aes(fill=factor(get(topconf),levels=c(1,0))))+theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','grey'))
+  ggsave(paste('figures/',name,'_example_top_confounder_analysis.png',sep=''))
+
+  vibration_data_sub2 = vibration_data %>% select(colnames(vibration_data[,botconf]),estimate,p.value)%>% mutate(var=colnames(vibration_data[,botconf]))
+  max_x_val = max(abs(vibration_data_sub2 %>% select(estimate) %>% range))+.001
+  ggplot(data = vibration_data_sub2, aes(x = estimate, color=factor(get(botconf),levels=c(1,0)), y = -log10(p.value))) +geom_point(alpha=.2,shape=21,size=.3,aes(fill=factor(get(botconf),levels=c(1,0))))+theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','grey'))
+  ggsave(paste('figures/',name,'_example_bot_confounder_analysis.png',sep=''))
+}
+
+setwd('~/GitHub/voe/manuscript')
+
+files=list.files()[grep('_pa_',list.files())]
+files=files[grep('10000',files)]
+files=files[-grep('100000',files)]
+
+all_vibration_data=list()
+for(p in phenotypes){
+  for(f in files){
+    vibration_output=data$vibration_output
+    all_vibration_data[[p]]=vibration_output
+  }
+}
+
+full_output = bind_rows(map(all_vibration_data, function(x) x[[3]] %>% mutate(phenoname=names(x)[3])))
+full_output$term = factor(full_output$term)
+full_output = full_output[ , colSums(is.na(full_output)) == 0] %>% select_if(~ length(unique(.)) > 1) %>% select(-full_fits)
+
+ifs = unique(full_output$independent_feature)
+
+for(name in ifs){
+  indvars = unique(full_output$term)
+  vibration_data = full_output %>% filter(independent_feature==name) 
+  get_confounders(vibration_data,dictionary,name)
+  for(i in indvars){
+    max_x_val = max(abs(vibration_data %>% filter(term==i) %>% select(estimate) %>% range))+.001
+    ggplot(data = full_output %>% filter(independent_feature==name) %>% filter(term==i), aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=100)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,20)
+    ggsave(paste('figures/',name,'_',i,'.pdf',sep=''),width=4,height=5)
+  }
+}
+
+```
+
+
+```{r}
+#fraction of models (positive/negative) with significant p-value (nominal)
+setwd('~/GitHub/voe/manuscript/figures')
+
+full_output = bind_rows(map(all_vibration_data, function(x) x[[3]] %>% mutate(phenoname=names(x)[3])))
+
+full_output_for_prob_analysis = full_output %>% mutate(pos = if_else(estimate>0,1,0),sig=if_else(estimate<=0.05,1,0)) %>% group_by(independent_feature,term,pos)%>% select(sig) %>% count(sig) 
+
+full_output_for_prob_analysis = full_output_for_prob_analysis %>% ungroup() %>% group_by(independent_feature,term) %>% mutate(total=sum(n)) %>% filter(sig==1) %>% select(-sig) %>% mutate(fraction_significant = n/total)
+
+ggplot(full_output_for_prob_analysis,aes(x=term,fill=as.factor(pos),group=as.factor(independent_feature),y=fraction_significant)) + geom_bar(stat='identity',position='dodge',alpha=.5) + coord_flip()
+ggsave('fraction_positive_significant.pdf')
 
 ```

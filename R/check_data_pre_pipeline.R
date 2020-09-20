@@ -26,7 +26,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     log4r::info(logger,paste('FDR method: ',fdr_method,sep=''))
     log4r::info(logger,paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
-    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
     log4r::info(logger,paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
@@ -58,7 +58,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     log4r::info(logger,paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     log4r::info(logger,paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
-    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
     log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features.'))

@@ -69,9 +69,10 @@ for(p in phenotypes){
   }
   confounder_analysis_list = confounder_analysis_list %>% reduce(inner_join, by = "term") %>% select(-term)
   confounder_analysis_list = confounder_analysis_list[, c(1,5,2,6,3,7,4,8)]
-  write.csv(confounder_analysis_list,paste('figures/corplot_',strsplit(f,'.csv')[[1]][[1]],sep=''))
+  confounder_analysis_list = cor(confounder_analysis_list)
+  write.csv(confounder_analysis_list,paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'.csv',sep=''))
   pdf(paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'.pdf',sep=''),width=3,height=3)
-  pheatmap(cor(confounder_analysis_list),cluster_rows=FALSE,cluster_cols=FALSE,main = p,breaks=breaksList)
+  pheatmap(confounder_analysis_list,cluster_rows=FALSE,cluster_cols=FALSE,main = p,breaks=breaksList)
   dev.off()
 }
 
@@ -106,11 +107,16 @@ files=files[grep('10000',files)]
 files=files[-grep('100000',files)]
 
 all_vibration_data=list()
+summary_data=list()
 for(f in files){
     data=readRDS(f)
     vibration_output=data$vibration_output
+    summary_data[[f]] = vibration_output$summarized_vibration_output %>% mutate(dep_feature = strsplit(f,'.rds') %>% map_chr(1) %>% strsplit('10000_') %>% map_chr(2))
     all_vibration_data[[f]]=vibration_output
 }
+
+summary_data = bind_rows(summary_data)
+write.csv(summary_data,'~/GitHub/voe/manuscript/figures/voe_summary_data.csv')
 
 full_output = bind_rows(map(all_vibration_data, function(x) x[[3]] %>% mutate(phenoname=names(x)[3])))
 full_output$term = factor(full_output$term)

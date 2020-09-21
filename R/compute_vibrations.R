@@ -81,8 +81,13 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
     in_sub=in_sub %>% dplyr::select(-dplyr::all_of(todrop))
   }
   dep_sub = dep_sub %>% dplyr::select(.data$sampleID,c(features_of_interest))
-  variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,dplyr::all_of(regression_weights))))
+  variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,dplyr::all_of(regression_weights),dplyr::all_of(primary_variable))))
+  overlap = intersect(colnames(in_sub %>% dplyr::select(-.data$sampleID)),colnames(dep_sub %>% dplyr::select(-.data$sampleID)))
+  if(length(overlap)>0){
+    in_sub = in_sub %>% dplyr::select(-c(dplyr::all_of(overlap)))
+  }
   merged_data=dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub %>% dplyr::mutate_if(is.factor, as.character),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
+  saveRDS(merged_data,'temp.rds')
   if(as.integer(cores)>1){
     options(future.globals.maxSize = +Inf)
     future::plan(future::multisession, workers = as.integer(cores))

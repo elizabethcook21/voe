@@ -75,6 +75,11 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   if(ncol(independent_variables)==2){
     vibrate=FALSE
   }
+  overlap = intersect(colnames(independent_variables %>% dplyr::select(-.data$sampleID)),colnames(dependent_variables %>% dplyr::select(-.data$sampleID)))
+  if(length(overlap)>0){
+    log4r::info(logger,'The following variables are in both the dependent and independent datasets. This will may cause some some regressions to fail, though the pipeline will still run to completion.')
+    independent_variables = independent_variables %>% dplyr::select(-c(dplyr::all_of(overlap)))
+  }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-.data$sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger))
   out_success = out[unlist(purrr::map(out,function(x) tibble::is_tibble(x)))]
   if(length(out_success)!=length(out)){

@@ -15,7 +15,7 @@
 #' @keywords regression, initial assocatiation
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
   feature_name = colnames(dependent_variables)[j+1]
-  regression_df=dplyr::left_join(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)),independent_variables %>% dplyr::mutate_if(is.factor, as.character),by = c("sampleID")) %>% dplyr::mutate_if(is.character, as.factor)
+  regression_df=suppressMessages(dplyr::left_join(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)),independent_variables %>% dplyr::mutate_if(is.factor, as.character)) %>% dplyr::mutate_if(is.character, as.factor))
   regression_df = regression_df %>% dplyr::select(-.data$sampleID)
   #run regression
   if(model_type=='negative_binomial'){
@@ -77,12 +77,10 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   }
   overlap = intersect(colnames(independent_variables %>% dplyr::select(-.data$sampleID)),colnames(dependent_variables %>% dplyr::select(-.data$sampleID)))
   if(length(overlap)>0){
-    log4r::info(logger,'The following variables are in both the dependent and independent datasets. This will may cause some some regressions to fail, though the pipeline will still run to completion.')
+    log4r::info(logger,'The following variables are in both the dependent and independent datasets. This may cause some some regressions to fail, though the pipeline will still run to completion.')
     log4r::info(logger,overlap)
-    dependent_variables = dependent_variables %>% dplyr::select(-c(dplyr::all_of(overlap)))
   }
   out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-.data$sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger))
-  saveRDS(out,'temp.rds')
   out_success = out[unlist(purrr::map(out,function(x) tibble::is_tibble(x)))]
   if(length(out_success)!=length(out)){
     log4r::info(logger,paste('Dropping',length(out)-length(out_success),'features with regressions that failed to converge.'))

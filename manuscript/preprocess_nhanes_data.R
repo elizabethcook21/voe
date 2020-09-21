@@ -1,7 +1,7 @@
 library(tidyverse)
 
 load('nhanes9904_VoE.Rdata')
-data_filtered = mainTab %>% filter(!is.na(LBDLDL),!is.na(LBXGLU),!is.na(LBXTC),!is.na(MSYS))
+data_filtered = mainTab %>% filter(!is.na(BMXBMI),!is.na(LBDLDL),!is.na(LBXGLU),!is.na(LBXTC),!is.na(MSYS))
 
 toremove = which(colSums(is.na(data_filtered))/nrow(data_filtered)>=.5)
 data_filtered= data_filtered %>% select(-c(names(toremove),area,bmi))  %>% mutate(sampleID=seq(nrow(data_filtered)))

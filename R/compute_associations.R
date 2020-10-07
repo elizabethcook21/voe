@@ -9,11 +9,10 @@
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
-#' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
 #' @keywords regression, initial assocatiation
-regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger){
+regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights){
   feature_name = colnames(dependent_variables)[j+1]
   regression_df=suppressMessages(dplyr::left_join(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)),independent_variables %>% dplyr::mutate_if(is.factor, as.character)) %>% dplyr::mutate_if(is.character, as.factor))
   regression_df = regression_df %>% dplyr::select(-.data$sampleID)
@@ -42,32 +41,31 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
-#' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
 #' @keywords regression, initial assocatiation
-run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger){
+run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights){
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
   toremove = which(colSums(dependent_variables %>% dplyr::select(-.data$sampleID) == 0,na.rm=TRUE)/nrow(dependent_variables)>proportion_cutoff)
-  log4r::info(logger,paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
+  print(paste("Removing",length(toremove),"features that are at least",proportion_cutoff*100,"percent zero values."))
   dependent_variables=dependent_variables %>% dplyr::select(-(toremove+1))
   if(ncol(dependent_variables)==1){
-    log4r::info(logger,'After filtering your data, you had nothing left. Try changing your filtering threshold for zero-value data and running again.')
+    print('After filtering your data, you had nothing left. Try changing your filtering threshold for zero-value data and running again.')
     quit()
   }
   independent_variables <- dplyr::as_tibble(x[[2]])
   colnames(independent_variables)[[1]]='sampleID'
-  log4r::info(logger,paste('Computing',as.character(ncol(dependent_variables)-1),'associations for dataset',as.character(unname(unlist(x[[3]])))))
+  print(paste('Computing',as.character(ncol(dependent_variables)-1),'associations for dataset',as.character(unname(unlist(x[[3]])))))
   colnames(dependent_variables)[1]='sampleID'
   colnames(independent_variables)[1]='sampleID'
   tokeep = independent_variables %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
-    log4r::info(logger,'Note: The following variables lack multiple levels and will be dropped should you run a vibration:')
-    log4r::info(logger,todrop)
+    print('Note: The following variables lack multiple levels and will be dropped should you run a vibration:')
+    print(todrop)
     if(primary_variable %in% todrop){
-      log4r::info(logger,'One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
+      print('One of the variables being dropped is your variable of interest...this will result in the pipeline failing. Please adjust your independent variables and try again.')
       quit()
     }
   }
@@ -77,16 +75,16 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   }
   overlap = intersect(colnames(independent_variables %>% dplyr::select(-.data$sampleID)),colnames(dependent_variables %>% dplyr::select(-.data$sampleID)))
   if(length(overlap)>0){
-    log4r::info(logger,'The following variables are in both the dependent and independent datasets. This may cause some some regressions to fail, though the pipeline will still run to completion.')
-    log4r::info(logger,overlap)
+    print('The following variables are in both the dependent and independent datasets. This may cause some some regressions to fail, though the pipeline will still run to completion.')
+    print(overlap)
   }
-  out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-.data$sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights,logger))
+  out = purrr::map(seq_along(dependent_variables %>% dplyr::select(-.data$sampleID)), function(j) regression(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,regression_weights))
   out_success = out[unlist(purrr::map(out,function(x) tibble::is_tibble(x)))]
   if(length(out_success)!=length(out)){
-    log4r::info(logger,paste('Dropping',length(out)-length(out_success),'features with regressions that failed to converge.'))
+    print(paste('Dropping',length(out)-length(out_success),'features with regressions that failed to converge.'))
   }
   if(length(out_success)==0){
-    log4r::info(logger,paste("All of your regression output failed. Printing error messages to screen."))
+    print(paste("All of your regression output failed. Printing error messages to screen."))
     Sys.sleep(3)
     print(out)
     quit()
@@ -105,18 +103,17 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
-#' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
 #' @keywords regression, initial assocatiation
 #' @export
-compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights,logger){
-    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights,logger))
+compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate, regression_weights){
+    output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate, regression_weights))
     output_regs = purrr::map(output, function(x) x[[1]])
     output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))
     if(FALSE %in% output_vib & vibrate!=FALSE){
       output_vib=FALSE
-      log4r::info(logger,'For at least one dataset, we dropped all the variables that you could possible vibrate over due to lacking multiple levels. Vibrate parameter being set to FALSE.')
+      print('For at least one dataset, we dropped all the variables that you could possible vibrate over due to lacking multiple levels. Vibrate parameter being set to FALSE.')
     }
     output_regs = dplyr::bind_rows(output_regs)
   return(list('output'=output_regs,'vibrate'=output_vib))

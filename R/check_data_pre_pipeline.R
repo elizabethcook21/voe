@@ -12,22 +12,21 @@
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param meta_analysis TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
-#' @param logger Logger object (default = NULL).
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
 #' @keywords pipeline
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, logger){
-  log4r::info(logger,'Checking input data...')
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type){
+  print('Checking input data...')
   if(meta_analysis==TRUE){
 #    if(model_type=='rf'){
-#      log4r::info(logger,'You seem to be attempting to meta-analyze random forest output. This is not feasible with our current pipeline. Please change the meta_analysis parameter to FALSE and try again.')
+#      print('You seem to be attempting to meta-analyze random forest output. This is not feasible with our current pipeline. Please change the meta_analysis parameter to FALSE and try again.')
 #    }
-    log4r::info(logger,paste('Primary variable of interest: ',primary_variable,sep=''))
-    log4r::info(logger,paste('FDR method: ',fdr_method,sep=''))
-    log4r::info(logger,paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
-    log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
-    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
-    log4r::info(logger,paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
+    print(paste('Primary variable of interest: ',primary_variable,sep=''))
+    print(paste('FDR method: ',fdr_method,sep=''))
+    print(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
+    print(paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    print(paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
+    print(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
     num_samples = purrr::map(dependent_variables, function(x) nrow(x)-1)
     num_ind = purrr::map(independent_variables, function(x) ncol(x)-1)
@@ -36,19 +35,19 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     print((data_summary))
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
-    log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features.'))
+    print(paste('This works out to a max of',as.character(max_models),'models across all features.'))
     if(max_models>10000000){
-      log4r::info(logger,'Warning: a run at this scale (over 10 million models fit) may take a long time.')
+      print('Warning: a run at this scale (over 10 million models fit) may take a long time.')
       Sys.sleep(2)
     }
-    log4r::info(logger,'Checking sample IDs...')
+    print('Checking sample IDs...')
     ind_sampids=purrr::map(independent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
     dep_sampids=purrr::map(dependent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
     if(unique(unlist(unname(purrr::map(seq(length(ind_sampids)), function(x) unique(ind_sampids[[x]]==dep_sampids[[x]])))))!=TRUE){
-      log4r::info(logger,'Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
+      print('Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
       quit()
     }
-    log4r::info(logger,'Checking for illegal variable names...')
+    print('Checking for illegal variable names...')
     illegal_names = c('dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')
     allnames=unique(unname(unlist(c(purrr::map(dependent_variables, function(x) colnames(x)), purrr::map(independent_variables, function(x) colnames(x))))))
     to_change = intersect(illegal_names,allnames)
@@ -58,40 +57,40 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     num_samples = nrow(dependent_variables) - 1
     num_ind = ncol(independent_variables) - 1
     data_summary = dplyr::bind_cols(list('feature_num' = unlist(unname(num_features)),'sample_num' = unlist(unname(num_samples)),'adjuster_num' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset=seq_along(num_features))
-    log4r::info(logger,paste('Preparing to run VoE pipeline for',as.character(num_features),'features,',as.character(num_samples),'samples, and',as.character(num_ind),'adjusters.'))
-    log4r::info(logger,paste('Model type: ',model_type,sep=''))
-    log4r::info(logger,paste('Primary variable of interest: ',primary_variable,sep=''))
-    log4r::info(logger,paste('FDR method: ',fdr_method,sep=''))
-    log4r::info(logger,paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
-    log4r::info(logger,paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
-    log4r::info(logger,paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
-    log4r::info(logger,paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
+    print(paste('Preparing to run VoE pipeline for',as.character(num_features),'features,',as.character(num_samples),'samples, and',as.character(num_ind),'adjusters.'))
+    print(paste('Model type: ',model_type,sep=''))
+    print(paste('Primary variable of interest: ',primary_variable,sep=''))
+    print(paste('FDR method: ',fdr_method,sep=''))
+    print(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
+    print(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
+    print(paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    print(paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
-    log4r::info(logger,paste('This works out to a max of',as.character(max_models),'models across all features.'))
+    print(paste('This works out to a max of',as.character(max_models),'models across all features.'))
     if(max_models>10000000){
-      log4r::info(logger,'Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
+      print('Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
       Sys.sleep(2)
     }
-    log4r::info(logger,'Checking sample IDs...')
+    print('Checking sample IDs...')
     ind_sampids=independent_variables[,1]
     dep_sampids=dependent_variables[,1]
     if(all(ind_sampids,dep_sampids)==FALSE){
-      log4r::info(logger,'Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
+      print('Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
       quit()
     }
-  log4r::info(logger,'Checking for illegal variable names...')
+  print('Checking for illegal variable names...')
   illegal_names = c('dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')
   allnames=c(colnames(dependent_variables),colnames(independent_variables))
   to_change = intersect(illegal_names,allnames)
   }
   if(length(to_change)>0){
-    log4r::info(logger,'Illegal variable names that may disrupt pipeline have been identified. Please adjust the following column names in your input data.')
+    print('Illegal variable names that may disrupt pipeline have been identified. Please adjust the following column names in your input data.')
     print(to_change)
     return(FALSE)
   }
   else{
-    log4r::info(logger,'Pre-flight checks complete, you\'re ready to go.')
+    print('Pre-flight checks complete, you\'re ready to go.')
     return(TRUE)
   }
 }

@@ -16,15 +16,14 @@ return(name = list(tryCatch(meta::metagen(TE = te,seTE = sete, studlab = studlab
 #'
 #' Run meta-analysis for each feature
 #' @param df Association output.
-#' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @export
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @importFrom rlang :=
-compute_metaanalysis <- function(df,logger) {
+compute_metaanalysis <- function(df) {
   new_df <- tibble::tibble(analysis = "meta-analysis") # create new tibble with placeholder column
-  log4r::info(logger,'Computing meta-analysis')
+  print('Computing meta-analysis')
   features=unique(df$feature)
   ma_output_all = list()
   for (i in seq_along(features)) {
@@ -74,14 +73,13 @@ get_converged_metadfs <- function(meta_df,dataset_num) {
 #' Remove failed meta-analyses.
 #' @param input_meta_df Meta-analysis output.
 #' @param dataset_num Number of datasets.
-#' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
-get_summary_stats <- function(input_meta_df,dataset_num,logger) {
+get_summary_stats <- function(input_meta_df,dataset_num) {
   meta_df=get_converged_metadfs(input_meta_df,dataset_num)
   if(ncol(input_meta_df)!=ncol(meta_df)){
-    log4r::info(logger,paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features or they were found in only 1 dataset. These will be dropped from your output dataframe.'))
+    print(paste('Meta-analysis failed for',ncol(input_meta_df)-ncol(meta_df),'features or they were found in only 1 dataset. These will be dropped from your output dataframe.'))
   }
   return(
     tibble::tibble(
@@ -102,12 +100,11 @@ get_summary_stats <- function(input_meta_df,dataset_num,logger) {
 #' Export meta-analysis.
 #' @param metaanalysis Meta-analysis output.
 #' @param dataset_num Number of datasets.
-#' @param logger Logger object (default = NULL).
 #' @keywords meta-analysis
 #' @importFrom rlang .data 
 #' @importFrom dplyr "%>%"
-clean_metaanalysis <- function(metaanalysis,dataset_num,logger) {
+clean_metaanalysis <- function(metaanalysis,dataset_num) {
   meta_outputs <- tibble::as_tibble(metaanalysis)
-  output <- get_summary_stats(meta_outputs,dataset_num,logger)
+  output <- get_summary_stats(meta_outputs,dataset_num)
   return(output)
 }

@@ -65,12 +65,11 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
 #' @param features_of_interest Feature to vibrate over.
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param cores Number of threads.
-#' @param logger Logger object (default = NULL).
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @keywords regression, initial assocatiation
-dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){
-  log4r::info(logger,paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
+dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,max_vars_in_model){
+  print(paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
   dep_sub = subframe[[1]]
   in_sub = subframe[[2]]
   colnames(dep_sub)[[1]]='sampleID'
@@ -107,13 +106,12 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
 #' @param features_of_interest Feature to vibrate over.
 #' @param regression_weights Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).
 #' @param cores Number of threads.
-#' @param logger Logger object (default = NULL).
 #' @keywords regression, initial assocatiation
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @export
-compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,logger,max_vars_in_model){
-  output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)))
+compute_vibrations <- function(bound_data,primary_variable,model_type,features_of_interest,max_vibration_num,proportion_cutoff,regression_weights,cores,max_vars_in_model){
+  output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,model_type ,features_of_interest,max_vibration_num, proportion_cutoff,regression_weights,cores,max_vars_in_model)))
   output = output %>% dplyr::filter(!is.na(.data$independent_feature))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-.data$sampleID,-primary_variable) %>% colnames))))
   return(list('vibration_output'=output,'vibration_variables'=vibration_variables))

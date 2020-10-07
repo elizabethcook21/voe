@@ -16,38 +16,35 @@
 #' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
 #' @param cores Number of cores to use for vibration (default = 1).
 #' @param confounder_analysis Run mixed effect confounder analysis (default=TRUE).
-#' @param log TRUE/FALSE. Save output to log file.
-#' @param log_file_path Location where you would like logfile to be saved if log==TRUE (default=NULL).
 #' @importFrom dplyr "%>%"
 #' @importFrom rlang .data
 #' @keywords pipeline
 #' @export
-full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', log=FALSE, cores = 1, confounder_analysis=TRUE,log_file_path=NULL){
-  logger <- initialize_logger(paste0('voe_pipeline_',format(Sys.time(), "%d-%b-%Y_%H.%M")), log, log_file_path)
+full_voe_pipeline <- function(dependent_variables,independent_variables,primary_variable,vibrate=TRUE,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=50000,regression_weights=NULL, max_vars_in_model = NULL,proportion_cutoff=.95,meta_analysis=FALSE, model_type='gaussian', cores = 1, confounder_analysis=TRUE){
   output_to_return = list()
   if(inherits(dependent_variables, "list")==TRUE){
-    log4r::info(logger,'Identified multiple input datasets, preparing to run meta-analysis.')
+    print('Identified multiple input datasets, preparing to run meta-analysis.')
     bound_data = dplyr::tibble(dependent_variables=dependent_variables,independent_variables=independent_variables,dsid = seq_along(independent_variables))
     dataset_num = nrow(bound_data)
     if(meta_analysis==FALSE){
-      return(log4r::info(logger,'The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
+      return(print('The meta_analysis variable is set to FALSE, but you appear to have passed multiple datasets. Please switch it to TRUE, and/or adjust other parameters as needed, and try again. For more information, please see the documentation.'))
     }
   }
   else{
     bound_data = dplyr::tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
-  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type,logger)#, mtry, num.trees, importance,min.node.size,splitrule)
+  passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type)#, mtry, num.trees, importance,min.node.size,splitrule)
   if(passed==TRUE){
     Sys.sleep(2)
-    log4r::info(logger,'Deploying initial associations...')
-    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, regression_weights, logger)
+    print('Deploying initial associations...')
+    association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, regression_weights)
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]
     association_output=association_output_full[['output']]
     if(meta_analysis == TRUE){
-      metaanalysis <- compute_metaanalysis(association_output,logger)
-      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis,dataset_num,logger)
+      metaanalysis <- compute_metaanalysis(association_output)
+      metaanalysis_cleaned <- clean_metaanalysis(metaanalysis,dataset_num)
       output_to_return[['meta_analyis_output']] = metaanalysis_cleaned
       features_of_interest = metaanalysis_cleaned %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(.data$feature) %>% unique
     }
@@ -55,22 +52,22 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       features_of_interest = association_output %>% dplyr::filter(!!rlang::sym(fdr_method)<=as.numeric(fdr_cutoff)) %>% dplyr::select(.data$feature) %>% unique
    }
     if(length(unlist(unname(features_of_interest)))==0){
-      log4r::info(logger,'No significant features found, consider adjusting parameters or data and trying again.')
+      print('No significant features found, consider adjusting parameters or data and trying again.')
       return(output_to_return)
     }
     if(vibrate==TRUE){
       output_to_return[['features_to_vibrate_over']] = features_of_interest
-      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,regression_weights,cores,logger,max_vars_in_model)
+      vibration_output = compute_vibrations(bound_data,primary_variable,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,regression_weights,cores,max_vars_in_model)
       output_to_return[['vibration_variables']] = vibration_output[[2]]
       if(confounder_analysis==TRUE){
-        analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis,logger)
+        analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis)
         output_to_return[['vibration_output']] = analyzed_voe_data
       }
       else{
         output_to_return[['vibration_output']] = vibration_output[[1]]
       }
     }
-    log4r::info(logger,'Done!')
+    print('Done!')
     return(output_to_return)
   }
 }

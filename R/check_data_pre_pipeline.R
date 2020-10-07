@@ -74,8 +74,8 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
       Sys.sleep(2)
     }
     log4r::info(logger,'Checking sample IDs...')
-    ind_sampids=purrr::map(independent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
-    dep_sampids=purrr::map(dependent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
+    ind_sampids=independent_variables[,1]
+    dep_sampids=dependent_variables[,1]
     if(ind_sampids!=dep_sampids){
       log4r::info(logger,'Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
       quit()

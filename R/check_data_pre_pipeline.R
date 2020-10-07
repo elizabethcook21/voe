@@ -41,14 +41,12 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
       log4r::info(logger,'Warning: a run at this scale (over 10 million models fit) may take a long time.')
       Sys.sleep(2)
     }
-    log4r::info(logger,'Checking for sample IDs...')
+    log4r::info(logger,'Checking sample IDs...')
     ind_sampids=purrr::map(independent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
     dep_sampids=purrr::map(dependent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
-    if(unique(purrr::map(seq(length(ind_sampids)), function(x) unique(ind_sampids[[x]]==dep_sampids[[x]])))!=TRUE){
-    log4r::info(logger,'Looks like you have differing number of sample in your dependent and independent data. Please correct this and try again.')
-    }
-    if(unique(purrr::map(seq(length(ind_sampids)), function(x) typeof(ind_sampids[[x]]==dep_sampids[[x]])))!=TRUE){
-    log4r::info(logger,"Looks like your sample IDs are of different types. Please ensure all the columns you're passing is the correct type (e.g. character) before continuing.")
+    if(unique(unlist(unname(purrr::map(seq(length(ind_sampids)), function(x) unique(ind_sampids[[x]]==dep_sampids[[x]])))))!=TRUE){
+      log4r::info(logger,'Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
+      quit()
     }
     log4r::info(logger,'Checking for illegal variable names...')
     illegal_names = c('dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')
@@ -74,6 +72,13 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     if(max_models>10000000){
       log4r::info(logger,'Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
       Sys.sleep(2)
+    }
+    log4r::info(logger,'Checking sample IDs...')
+    ind_sampids=purrr::map(independent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
+    dep_sampids=purrr::map(dependent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
+    if(ind_sampids!=dep_sampids){
+      log4r::info(logger,'Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
+      quit()
     }
   log4r::info(logger,'Checking for illegal variable names...')
   illegal_names = c('dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')

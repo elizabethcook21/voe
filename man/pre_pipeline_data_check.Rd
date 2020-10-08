@@ -14,8 +14,7 @@ pre_pipeline_data_check(
   max_vars_in_model,
   proportion_cutoff,
   meta_analysis,
-  model_type,
-  logger
+  model_type
 )
 }
 \arguments{
@@ -38,8 +37,6 @@ pre_pipeline_data_check(
 \item{meta_analysis}{TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.}
 
 \item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
-
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Check datasets and print pre-run statistics prior to deployment.

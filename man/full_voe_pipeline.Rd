@@ -17,10 +17,8 @@ full_voe_pipeline(
   proportion_cutoff = 0.95,
   meta_analysis = FALSE,
   model_type = "gaussian",
-  log = FALSE,
   cores = 1,
-  confounder_analysis = TRUE,
-  log_file_path = NULL
+  confounder_analysis = TRUE
 )
 }
 \arguments{
@@ -48,13 +46,9 @@ full_voe_pipeline(
 
 \item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
 
-\item{log}{TRUE/FALSE. Save output to log file.}
-
 \item{cores}{Number of cores to use for vibration (default = 1).}
 
 \item{confounder_analysis}{Run mixed effect confounder analysis (default=TRUE).}
-
-\item{log_file_path}{Location where you would like logfile to be saved if log==TRUE (default=NULL).}
 }
 \description{
 This function will run the full pipeline

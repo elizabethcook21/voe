@@ -4,14 +4,13 @@
 \alias{analyze_voe_data}
 \title{Analyze VoE data}
 \usage{
-analyze_voe_data(vibration_output, confounder_analysis, logger)
+analyze_voe_data(vibration_output, confounder_analysis)
 }
 \arguments{
 \item{vibration_output}{Output list from the compute vibrations function.}
 
 \item{confounder_analysis}{TRUE/FALSE -- run confounder analysis (default = TRUE).}
 
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Post-process vibration output.

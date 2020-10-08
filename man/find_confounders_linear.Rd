@@ -4,12 +4,11 @@
 \alias{find_confounders_linear}
 \title{Find confounders}
 \usage{
-find_confounders_linear(voe_list_for_reg, logger)
+find_confounders_linear(voe_list_for_reg)
 }
 \arguments{
 \item{voe_list_for_reg}{A dataframe of expanded VoE output (output of filter_unnest_feature_vib)}
 
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Model confounding from vibration analysis.

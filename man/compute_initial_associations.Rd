@@ -10,8 +10,7 @@ compute_initial_associations(
   model_type,
   proportion_cutoff,
   vibrate,
-  regression_weights,
-  logger
+  regression_weights
 )
 }
 \arguments{
@@ -27,8 +26,6 @@ compute_initial_associations(
 
 \item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
 
-\item{logger}{Logger object (default = NULL).}
-}
 \description{
 Top-level function to run all associations for all datasets.
 }

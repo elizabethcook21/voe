@@ -10,8 +10,7 @@ run_associations(
   model_type,
   proportion_cutoff,
   vibrate,
-  regression_weights,
-  logger
+  regression_weights
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ run_associations(
 \item{vibrate}{TRUE/FALSE -- run vibrations (default=TRUE)}
 
 \item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
-
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Function to run all associations for dependent and indepenent features.

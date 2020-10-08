@@ -4,14 +4,13 @@
 \alias{get_adjuster_expanded_vibrations}
 \title{Expand vibration data}
 \usage{
-get_adjuster_expanded_vibrations(voe_df, adjusters, logger)
+get_adjuster_expanded_vibrations(voe_df, adjusters)
 }
 \arguments{
 \item{voe_df}{Raw vibration output, the first entry in the output of compute_vibrations.}
 
 \item{adjusters}{A dataframe, each column corresponding to the adjusters used in each dataset for vibrations. This is the second entry in the compute_vibrations output.}
 
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Add column to vibration output for each adjuster (indicating presence or absence in a model).

@@ -11,8 +11,7 @@ regression(
   primary_variable,
   model_type,
   proportion_cutoff,
-  regression_weights,
-  logger
+  regression_weights
 )
 }
 \arguments{
@@ -30,7 +29,6 @@ regression(
 
 \item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
 
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Run initial association for a single feature

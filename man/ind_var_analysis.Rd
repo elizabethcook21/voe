@@ -6,19 +6,13 @@
 \usage{
 ind_var_analysis(
   independent_variables,
-  output_location = getwd(),
-  log = FALSE,
-  log_file_path = NULL
+  output_location = getwd()
 )
 }
 \arguments{
 \item{independent_variables}{A tibble containing the information for your independent variables (e.g. age, sex). Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column anmes of the dependent_variables tibble.}
 
 \item{output_location}{The path where you want to save all the ggplots and metadata}
-
-\item{log}{TRUE/FALSE, indicates if you want to use the logging feature.}
-
-\item{log_file_path}{Path to where logfile will be saved (default = NULL).}
 }
 \description{
 This function will run the full pipeline

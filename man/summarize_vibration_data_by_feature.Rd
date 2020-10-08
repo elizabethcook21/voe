@@ -4,12 +4,10 @@
 \alias{summarize_vibration_data_by_feature}
 \title{summarize_vibration_data_by_feature}
 \usage{
-summarize_vibration_data_by_feature(df, logger)
+summarize_vibration_data_by_feature(df)
 }
 \arguments{
 \item{df}{A dataframe of expanded VoE output (output of filter_unnest_feature_vib)}
-
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Summarize output of vibrations for each dependent feature of interest.

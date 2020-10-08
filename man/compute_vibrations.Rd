@@ -13,7 +13,6 @@ compute_vibrations(
   proportion_cutoff,
   regression_weights,
   cores,
-  logger,
   max_vars_in_model
 )
 }
@@ -33,8 +32,6 @@ compute_vibrations(
 \item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
 
 \item{cores}{Number of threads.}
-
-\item{logger}{Logger object (default = NULL).}
 
 \item{max_vars_in_model}{Maximum number of variables allowed in in a model.}
 }

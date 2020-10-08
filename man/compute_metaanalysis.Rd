@@ -4,12 +4,11 @@
 \alias{compute_metaanalysis}
 \title{Run meta-analysis}
 \usage{
-compute_metaanalysis(df, logger)
+compute_metaanalysis(df)
 }
 \arguments{
 \item{df}{Association output.}
 
-\item{logger}{Logger object (default = NULL).}
 }
 \description{
 Run meta-analysis for each feature

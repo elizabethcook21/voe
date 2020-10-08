@@ -57,7 +57,7 @@ get_converged_metadfs <- function(meta_df,dataset_num) {
       count=count+1
       next
     }
-    if(nrow(meta_df[[x]][[1]][['data']])!=dataset_num){
+    if(nrow(meta_df[[x]][[1]][['data']])!=1){
       toremove[as.character(count)]=x
       count=count+1
     }

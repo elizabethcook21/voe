@@ -10,7 +10,6 @@ clean_metaanalysis(metaanalysis, dataset_num)
 \item{metaanalysis}{Meta-analysis output.}
 
 \item{dataset_num}{Number of datasets.}
-
 }
 \description{
 Export meta-analysis.

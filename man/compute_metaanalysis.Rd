@@ -8,7 +8,6 @@ compute_metaanalysis(df)
 }
 \arguments{
 \item{df}{Association output.}
-
 }
 \description{
 Run meta-analysis for each feature

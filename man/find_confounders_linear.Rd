@@ -8,7 +8,6 @@ find_confounders_linear(voe_list_for_reg)
 }
 \arguments{
 \item{voe_list_for_reg}{A dataframe of expanded VoE output (output of filter_unnest_feature_vib)}
-
 }
 \description{
 Model confounding from vibration analysis.

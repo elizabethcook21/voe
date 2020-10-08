@@ -10,7 +10,6 @@ analyze_voe_data(vibration_output, confounder_analysis)
 \item{vibration_output}{Output list from the compute vibrations function.}
 
 \item{confounder_analysis}{TRUE/FALSE -- run confounder analysis (default = TRUE).}
-
 }
 \description{
 Post-process vibration output.

@@ -82,7 +82,7 @@ for(p in phenotypes){
   confounder_analysis_list = cor(confounder_analysis_list)
   write.csv(confounder_analysis_list,paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'.csv',sep=''))
   pdf(paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'-.pdf',sep=''),width=3,height=3)
-  pheatmap(confounder_analysis_list,cluster_rows=FALSE,cluster_cols=FALSE,main = p,breaks=breaksList)
+  pheatmap(confounder_analysis_list,cluster_rows=FALSE,cluster_cols=FALSE,breaks=breaksList,legend = FALSE)
   dev.off()
 }
 
@@ -118,7 +118,7 @@ setwd('~/GitHub/voe/manuscript')
 files=list.files()[grep('_output_',list.files())]
 files=files[grep('10000_',files)]
 
-all_vibration_data=list()
+all_vibration_data=list() 
 summary_data=list()
 for(f in files){
     data=readRDS(f)
@@ -145,11 +145,11 @@ for(name in ifs){
   }
   vibration_data=vibration_data[ , colSums(is.na(vibration_data)) == 0]
   for(i in indvars){
-    #vibration_data = vibration_data %>% filter(term==i) %>% select(-term)
-  conf_analysis_temp = get_confounders(vibration_data,dictionary,name,i)
+    vibration_data2 = vibration_data %>% filter(term==i) %>% select(-term)
+  conf_analysis_temp = get_confounders(vibration_data2,dictionary,name,i)
   conf_analysis[[paste(i,name)]]=conf_analysis_temp
-    max_x_val = max(abs(vibration_data%>% select(estimate) %>% range))+.001
-    ggplot(data = full_output %>% filter(independent_feature==name) %>% filter(term==i), aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=100)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,25)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
+    max_x_val = max(abs(vibration_data2%>% select(estimate) %>% range))+.001
+    ggplot(data = vibration_data2, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=100)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,25)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
     ggsave(paste('figures/',name,'_',i,'.pdf',sep=''),width=3,height=3)
   }
 }
@@ -165,7 +165,7 @@ conf_analysis = bind_rows(conf_analysis)
 ```{r}
 #specific janus effect analysis
 deps_of_interest = c('LBDLDL','MSYS','LBXTC','BMXBMI')
-inds_of_interest = c('physical_activity','bDIETARY_FIBER_gm','physical_activity','DR1TTFAT')
+inds_of_interest = c('physical_activity','bDIETARY_FIBER_gm','LBXCOT','DR1TTFAT')
 
 for(val in seq(length(deps_of_interest))){
   conf_analysis_sub_asr  = conf_analysis %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate)) %>% filter(term == 'RIDRETH1'|term == 'male'| term=='RIDAGEYR'|term=='SES_LEVEL'|term=='education')
@@ -177,9 +177,13 @@ ggplot(conf_analysis_sub,aes(x=reorder(variable_description,desc(estimate)),y=es
   vars = c(unname(unlist(conf_analysis_sub$term)),unname(unlist(conf_analysis_sub_asr$term)))
   for(v in vars){
     full_output_sub = full_output %>% filter(term == inds_of_interest[[val]], independent_feature == deps_of_interest[[val]]) %>% select(estimate,p.value,term,independent_feature,v)
-  max_x_val = max(abs(full_output_sub %>% select(estimate) %>% range))+.001
-      p1 = ggplot(data = full_output_sub %>% filter(get(v)==1), aes(x = estimate, y = -log10(p.value))) + geom_hex(bins=100)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,25)+ xlim(-1*max_x_val,max_x_val) 
-    (p1 + geom_hex(data = full_output_sub %>% filter(get(v)==0), aes(x = estimate, y = -log10(p.value)),bins=100,alpha=.1)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,25)+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1")))+ xlim(-1*max_x_val,max_x_val)+ggtitle(paste('Adjusted for ',v,sep='')) 
+  max_x_val = max(abs(full_output_sub %>% select(estimate) %>% range))+.00001
+  max_y_val = -log10(max(abs(full_output_sub %>% select(p.value) %>% range)))+1
+  if(max_y_val<2){
+    max_y_val=2
+  }
+      p1 = ggplot(data = full_output_sub %>% filter(get(v)==1), aes(x = estimate, y = -log10(p.value))) + geom_hex(bins=100)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,max_y_val)+ xlim(-1*max_x_val,max_x_val) 
+    (p1 + geom_hex(data = full_output_sub %>% filter(get(v)==0), aes(x = estimate, y = -log10(p.value)),bins=100,alpha=.1)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,max_y_val)+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1")))+ xlim(-1*max_x_val,max_x_val)+ggtitle(paste('Adjusted for ',v,sep='')) 
     ggsave(paste('figures/voeplots/',deps_of_interest[[val]],'_',v,'.pdf',sep=''),width=5,height=5)
 
   }
@@ -187,45 +191,19 @@ ggplot(conf_analysis_sub,aes(x=reorder(variable_description,desc(estimate)),y=es
 ```
 
 ```{r}
-#examples
-topconf='LBXIHG'
-botconf='occupation'
+load('nhanes9904_VoE.Rdata')
 
-for(name in unique(full_output$independent_feature)){
-#  vibration_data_sub1 = full_output %>% filter(independent_feature==name) %>% select(colnames(vibration_data[,topconf]),estimate,p.value)%>% mutate(var=colnames(vibration_data[,topconf]))
- #   max_x_val = max(abs(vibration_data_sub1 %>% select(estimate) %>% range))+.001
-#    ggplot(data = vibration_data_sub1, aes(x = estimate, color=factor(get(topconf),levels=c(1,0)), y = -log10(p.value))) +geom_point(alpha=.2,shape=21,size=.3,aes(fill=factor(get(topconf),levels=c(1,0))))+theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','grey'))
- #  ggsave(paste('figures/',topconf,'_',name,'_example_top_confounder_analysis.png',sep=''))
-  
-  vibration_data_sub2 = full_output %>% filter(independent_feature==name)%>% select(colnames(vibration_data[,botconf]),estimate,p.value)%>% mutate(var=colnames(vibration_data[,botconf]))
-   max_x_val = max(abs(vibration_data_sub2 %>% select(estimate) %>% range))+.001
-   ggplot(data = vibration_data_sub2, aes(x = estimate, color=factor(get(botconf),levels=c(1,0)), y = -log10(p.value))) +geom_point(alpha=alpha,shape=21,size=1.3,aes(fill=factor(get(botconf),levels=c(1,0))))+theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,20)
-   p1 = ggplot(data = vibration_data_sub2 %>% filter(get(botconf)==1), aes(x = estimate, y = -log10(p.value))) + geom_hex(bins=100)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,20)
-  p1 + geom_hex(data = vibration_data_sub2 %>% filter(get(botconf)==0), aes(x = estimate, y = -log10(p.value)),bins=100,alpha=.1)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,20)+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))
-  ggsave(paste('figures/',botconf,'_',name,'_example_bot_confounder_analysis.pdf',sep=''),width=5,height=5)
-  vibration_data_sub3=full_output %>% filter(independent_feature==name)%>% select(colnames(vibration_data[,botconf]),estimate,p.value,term)%>% mutate(var=colnames(vibration_data[,botconf]))
-  for(f2 in unique(vibration_data_sub3$term)){
-   max_x_val = max(abs(vibration_data_sub2 %>% select(estimate) %>% range))+.001
-   p1 = ggplot(data = vibration_data_sub3 %>% filter(get(botconf)==1, term==f2), aes(x = estimate, y = -log10(p.value))) + geom_hex(bins=100)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,20)
-  p1 + geom_hex(data = vibration_data_sub3 %>% filter(get(botconf)==0, term==f2), aes(x = estimate, y = -log10(p.value)),bins=100,alpha=.1)+theme(legend.position="none") +theme(legend.title = element_blank()) + xlab('Estimate') +xlim(-1*max_x_val,max_x_val) + theme(legend.text=element_text(size=6))+ggtitle('')+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) +scale_color_manual(values=c('blue','gray'))+ylim(0,20)+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))
-  ggsave(paste('figures/',botconf,'_',name,'_',f2,'_example_bot_confounder_analysis.pdf',sep=''),width=3,height=3)
-  }
-}
+library(pre)
+
+conf_analysis_sub  = conf_analysis %>% filter(dep_feature == 'LBXTC', ind_feature == 'LBXCOT') %>% arrange(desc(estimate))%>% head(10) %>% select(term) %>% unlist %>% unname %>% as.character()
+
+conf_analysis_sub2  = conf_analysis %>% filter(dep_feature == 'LBXTC', ind_feature == 'LBXCOT') %>% arrange(desc(estimate))%>% head(10) %>% select(variable_description) %>% unlist %>% unname %>% as.character()
 
 
-```
+forpre = mainTab %>% select(LBXTC,LBXCOT,conf_analysis_sub,WTMEC2YR)
 
-```{r}
-#fraction of models (positive/negative) with significant p-value (nominal)
-setwd('~/GitHub/voe/manuscript/figures')
+preout = pre(data=forpre,formula=LBXTC ~ . - WTMEC2YR,weights=forpre$WTMEC2YR)
 
-full_output = bind_rows(map(all_vibration_data, function(x) x[[3]] %>% mutate(phenoname=names(x)[3])))
 
-full_output_for_prob_analysis = full_output %>% mutate(pos = if_else(estimate>0,1,0),sig=if_else(estimate<=0.05,1,0)) %>% group_by(independent_feature,term,pos)%>% select(sig) %>% count(sig) 
-
-full_output_for_prob_analysis = full_output_for_prob_analysis %>% ungroup() %>% group_by(independent_feature,term) %>% mutate(total=sum(n)) %>% filter(sig==1) %>% select(-sig) %>% mutate(fraction_significant = n/total)
-
-ggplot(full_output_for_prob_analysis,aes(x=term,fill=as.factor(pos),group=as.factor(independent_feature),y=fraction_significant)) + geom_bar(stat='identity',position='dodge',alpha=.5) + coord_flip()
-ggsave('fraction_positive_significant.pdf')
 
 ```

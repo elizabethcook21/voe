@@ -25,7 +25,7 @@ compute_initial_associations(
 \item{vibrate}{TRUE/FALSE -- run vibrations (default=TRUE)}
 
 \item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
-
+}
 \description{
 Top-level function to run all associations for all datasets.
 }

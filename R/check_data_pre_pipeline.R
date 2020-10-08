@@ -74,7 +74,9 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     }
     print('Checking sample IDs...')
     ind_sampids=independent_variables[,1]
+    print(ind_sampids)
     dep_sampids=dependent_variables[,1]
+    print(dep_sampids)
     if(all(ind_sampids,dep_sampids)==FALSE){
       print('Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
       quit()

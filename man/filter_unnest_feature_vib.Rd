@@ -8,7 +8,6 @@ filter_unnest_feature_vib(vib_df)
 }
 \arguments{
 \item{vib_df}{VoE dataframe with columns for each adjuster (output of get_adjuster_expanded_vibrations).}
-
 }
 \description{
 Unnest regression output for vibrations.

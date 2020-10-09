@@ -43,10 +43,10 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     print('Checking sample IDs...')
     ind_sampids=purrr::map(independent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
     dep_sampids=purrr::map(dependent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
-    if(unique(unlist(unname(purrr::map(seq(length(ind_sampids)), function(x) unique(ind_sampids[[x]]==dep_sampids[[x]])))))!=TRUE){
-      print('Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
-      quit()
-    }
+  #  if(unique(unlist(unname(purrr::map(seq(length(ind_sampids)), function(x) unique(ind_sampids[[x]]==dep_sampids[[x]])))))!=TRUE){
+  #    print('Looks like between your independent and dependent variables you have either differing number of samples, your sample IDs are of different types, or you do not have a 1 to 1 sampleID mapping between the two dataframes. Please examine your data and try again.')
+  #    quit()
+   # }
     print('Checking for illegal variable names...')
     illegal_names = c('dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')
     allnames=unique(unname(unlist(c(purrr::map(dependent_variables, function(x) colnames(x)), purrr::map(independent_variables, function(x) colnames(x))))))

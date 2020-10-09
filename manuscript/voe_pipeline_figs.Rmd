@@ -26,11 +26,11 @@ theme_set(theme_cowplot())
 #benchmarking
 setwd('~/GitHub/voe/manuscript/')
 
-benchmarkdata = read.csv('jobtimedata.csv',header=F,sep=',')
-benchmarkdata$elapsed_time = as.numeric(gsub('S','',lubridate::seconds(hms(benchmarkdata$V3))))
-benchmarkdata$jobsize = as.numeric(gsub('K','',benchmarkdata$V4))/1000000
+benchmarkdata = read.csv('jobtimedata.csv',header=T,sep=',')
+benchmarkdata$elapsed_time = as.numeric(gsub('S','',lubridate::seconds(hms(benchmarkdata$time))))
+benchmarkdata$jobsize = as.numeric(gsub('K','',benchmarkdata$memory))/1000000
 
-benchmarkdata = benchmarkdata %>% select(V1,V5,V6,elapsed_time,jobsize)
+benchmarkdata = benchmarkdata %>% select(vibration_number,cores,phenotype,elapsed_time,jobsize)
 colnames(benchmarkdata)[3]='Independent variable'
 colnames(benchmarkdata)[2]='Cores'
 colnames(benchmarkdata)[1]='Number of vibrations'
@@ -38,14 +38,9 @@ colnames(benchmarkdata)[1]='Number of vibrations'
 ggplot(data=benchmarkdata %>% filter(Cores==20),aes(x=log(`Number of vibrations`),y=log(elapsed_time),color=`Independent variable`)) + geom_point() + ggtitle('Runtime benchmarking') + xlab('log(Number of vibrations)') + ylab('Log(Seconds)')
 ggsave('figures/jobtimes_multicore.pdf',width=7,height=5)
 
-ggplot(data=benchmarkdata %>% filter(Cores==1),aes(x=log(`Number of vibrations`),y=log(elapsed_time),color=`Independent variable`)) + geom_point() + ggtitle('Runtime benchmarking') + xlab('log(Number of vibrations)') + ylab('Log(Seconds)')
-ggsave('figures/jobtimes_singlecore.pdf',width=7,height=5)
-
 ggplot(data=benchmarkdata %>% filter(Cores==20),aes(x=log(`Number of vibrations`),y=log(jobsize),color=`Independent variable`)) + geom_point()+ ggtitle('Memory usage')+ xlab('log(Number of vibrations)') + ylab('Log(RAM used, GB)')
 ggsave('figures/memusage.pdf',width=7,height=5)
 
-ggplot(data=benchmarkdata %>% filter(Cores==1),aes(x=log(`Number of vibrations`),y=log(jobsize),color=`Independent variable`)) + geom_point()+ ggtitle('Memory usage')+ xlab('log(Number of vibrations)') + ylab('Log(RAM used, GB)')
-ggsave('figures/memusage_singlecore.pdf',width=7,height=5)
 
 ```
 ```{r}
@@ -169,7 +164,7 @@ inds_of_interest = c('physical_activity','bDIETARY_FIBER_gm','LBXCOT','DR1TTFAT'
 
 val = paste(deps_of_interest,inds_of_interest,sep='_')
 
-conf_analysis %>% mutate(temp=paste(dep_feature,ind_feature,sep='_')) %>% filter(temp %in% val) 
+conf_analysis = conf_analysis %>% mutate(temp=paste(dep_feature,ind_feature,sep='_')) %>% filter(temp %in% val) 
 
 for(val in seq(length(deps_of_interest))){
   conf_analysis_sub_asr  = conf_analysis %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate)) %>% filter(term == 'RIDRETH1'|term == 'male'| term=='RIDAGEYR'|term=='SES_LEVEL'|term=='education')

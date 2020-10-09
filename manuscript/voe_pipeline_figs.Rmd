@@ -167,6 +167,10 @@ conf_analysis = bind_rows(conf_analysis)
 deps_of_interest = c('LBDLDL','MSYS','LBXTC','BMXBMI')
 inds_of_interest = c('physical_activity','bDIETARY_FIBER_gm','LBXCOT','DR1TTFAT')
 
+val = paste(deps_of_interest,inds_of_interest,sep='_')
+
+conf_analysis %>% mutate(temp=paste(dep_feature,ind_feature,sep='_')) %>% filter(temp %in% val) 
+
 for(val in seq(length(deps_of_interest))){
   conf_analysis_sub_asr  = conf_analysis %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate)) %>% filter(term == 'RIDRETH1'|term == 'male'| term=='RIDAGEYR'|term=='SES_LEVEL'|term=='education')
 ggplot(conf_analysis_sub_asr,aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + xlab('') + ylab('Change in model effect size')+geom_errorbar(aes(ymin =estimate-std.error,ymax=estimate+std.error), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=30,hjust=1))+ggtitle(paste(deps_of_interest[[val]],'~',inds_of_interest[[val]]))

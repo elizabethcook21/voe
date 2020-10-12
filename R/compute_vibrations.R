@@ -76,9 +76,11 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
   colnames(in_sub)[[1]]='sampleID'
   tokeep = in_sub %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(in_sub),tokeep)
+  print(todrop)
   if(length(todrop)>1){
     in_sub=in_sub %>% dplyr::select(-dplyr::all_of(todrop))
   }
+  features_of_interest = intersect(features_of_interest,colnames(dep_sub))
   dep_sub = dep_sub %>% dplyr::select(.data$sampleID,c(features_of_interest))
   variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,dplyr::all_of(regression_weights),dplyr::all_of(primary_variable))))
   merged_data=suppressMessages(dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub %>% dplyr::mutate_if(is.factor, as.character)) %>% dplyr::mutate_if(is.character, as.factor))

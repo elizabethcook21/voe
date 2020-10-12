@@ -177,6 +177,9 @@ ggplot(conf_analysis_sub,aes(x=reorder(variable_description,desc(estimate)),y=es
   for(v in vars){
     full_output_sub = full_output %>% filter(term == inds_of_interest[[val]], independent_feature == deps_of_interest[[val]]) %>% select(estimate,p.value,term,independent_feature,v)
   max_x_val = max(abs(full_output_sub %>% select(estimate) %>% range))+.00001
+  if(deps_of_interest[[val]]=='BMXBMI'){
+    max_x_val = .1
+  }
   max_y_val = -log10(max(abs(full_output_sub %>% select(p.value) %>% range)))+1
   if(max_y_val<2){
     max_y_val=2

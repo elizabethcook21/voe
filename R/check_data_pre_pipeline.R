@@ -11,20 +11,31 @@
 #' @param max_vibration_num Maximum number of vibrations (default=50000).
 #' @param proportion_cutoff Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)
 #' @param meta_analysis TRUE/FALSE -- indicates if computing meta-analysis across multiple datasets.
-#' @param model_type Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")
+#' @param model_type Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at leaset weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as an additional argument to this function.
+#' @param family GLM family (default = gaussian()). For help see help(glm) or help(family).
+#' @param ids Name of column in dataframe pecifying cluster ids from largest level to smallest level. Only relevant for survey data. (Default = NULL).
+#' @param strata Name of column in dataframe with strata. Only relevant for survey data. (Default = NULL).]
+#' @param weights Name of column containing sampling weights.
+#' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
 #' @keywords pipeline
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type){
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type,family,ids,strata,weights,nest){
   print('Checking input data...')
+  if(model_type=='survey'){
+    print('Running a survey weighted regression, using the following passed parameters for the design:')
+    print(paste('weight = ',weights))
+    print(paste('ids = ',ids))
+    print(paste('strata = ',strata))
+    print(paste('nest =',nest))
+  }
   if(meta_analysis==TRUE){
-#    if(model_type=='rf'){
-#      print('You seem to be attempting to meta-analyze random forest output. This is not feasible with our current pipeline. Please change the meta_analysis parameter to FALSE and try again.')
-#    }
     print(paste('Primary variable of interest: ',primary_variable,sep=''))
     print(paste('FDR method: ',fdr_method,sep=''))
     print(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     print(paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
+    print(paste('Model type: ',model_type,sep=''))
+    print(paste('Family: ',family[[1]],sep=''))
     print(paste('Max number of independent features per vibration (if vibrate=TRUE): ',as.character(max_vars_in_model),sep=''))
     print(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
     num_features = purrr::map(dependent_variables, function(x) ncol(x)-1)
@@ -59,6 +70,7 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     data_summary = dplyr::bind_cols(list('feature_num' = unlist(unname(num_features)),'sample_num' = unlist(unname(num_samples)),'adjuster_num' = unlist(unname(num_ind)))) %>% dplyr::mutate(dataset=seq_along(num_features))
     print(paste('Preparing to run VoE pipeline for',as.character(num_features),'features,',as.character(num_samples),'samples, and',as.character(num_ind),'adjusters.'))
     print(paste('Model type: ',model_type,sep=''))
+    print(paste('Family: ',family[[1]],sep=''))
     print(paste('Primary variable of interest: ',primary_variable,sep=''))
     print(paste('FDR method: ',fdr_method,sep=''))
     print(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))

@@ -52,7 +52,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
         independent_feature = primary_variable,
         dataset_id = dataset_id,
         vars = varset,
-        full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(survey::svyglm(family=family,formula=stats::as.formula(stringr::str_c("I(`", feature,"`) ~ ",primary_variable)),design=dsn)),warning = function(w) w, error = function(e) e)),
+        full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(survey::svyglm(family=family,formula=stats::as.formula(paste("I(`",feature,"`) ~ ",primary_variable,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),design=dsn)),warning = function(w) w, error = function(e) e)),
         feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
         )
       ))
